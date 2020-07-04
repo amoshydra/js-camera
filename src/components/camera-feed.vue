@@ -1,13 +1,17 @@
 <template>
   <video
-    v-if="hasGetUserMedia"
+    v-if="!hasError && hasGetUserMedia"
     ref="video"
     autoplay
     @loadeddata="loadeddata"
   />
 
-  <div v-else>
-    This browser doesn't allow access to the camera
+  <div
+    class="error"
+    v-else
+  >
+    <div style="font-size: 5em; margin-bottom: 0.5em;">😟</div>
+    I cannot access to the camera.
   </div>
 </template>
 
@@ -29,17 +33,27 @@ export default Vue.extend({
       default: 'environment',
     },
   },
-  async mounted() {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: this.facingMode,
-        width: { ideal: this.width },
-        height: { ideal: this.height }
-      },
-    });
 
-    const videoEl = (this.$refs.video as HTMLVideoElement);
-    videoEl.srcObject = stream;
+  data() {
+    return {
+      hasError: false,
+    };
+  },
+
+  async mounted() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: this.facingMode,
+          width: { ideal: this.width },
+          height: { ideal: this.height }
+        },
+      });
+      const videoEl = (this.$refs.video as HTMLVideoElement);
+      videoEl.srcObject = stream;
+    } catch (error) {
+      this.hasError = true;
+    }
   },
 
   methods: {
@@ -56,3 +70,12 @@ export default Vue.extend({
   }
 });
 </script>
+
+<style scoped>
+.error {
+  border: 1em solid maroon;
+  padding-top: 3em;
+  padding-bottom: 3em;
+  box-sizing: border-box;
+}
+</style>
