@@ -3,38 +3,37 @@
     <a
       class="content-anchor content-text"
       v-if="isUrl"
-      :href="data.data"
+      :href="data"
       target="_blank"
       rel="noopener"
-    >{{ data.data }}</a>
+    >{{ data }}</a>
     <div
       class="content-text"
       v-else
     >
-      {{ data.data }}
+      {{ data }}
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from 'vue';
-import { QRCode } from 'jsqr'
+import Vue from 'vue';
 
 interface ComponentData {
-  data: QRCode | null;
+  data: string | null;
 }
 
 export default Vue.extend({
   props: {
     data: {
-      type: Object as PropType<QRCode>,
-      required: true,
+      type: String,
+      default: null,
     },
   },
   computed: {
     isUrl() {
       try {
-        new URL(this.data.data)
+        new URL(this.data)
         return true;
       } catch (error) {
         return false;

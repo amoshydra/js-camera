@@ -43,7 +43,7 @@ export default Vue.extend({
   },
 
   watch: {
-    data(newData) {
+    data({ data: newData }) {
       this.$emit('change', newData);
     },
 

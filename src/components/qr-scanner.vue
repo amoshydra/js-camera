@@ -22,10 +22,9 @@ import Vue from 'vue';
 import ContentRenderer from './ContentRenderer.vue'
 import QrReader from './QrReader.vue'
 import CameraFeed from './CameraFeed.vue'
-import { QRCode } from 'jsqr';
 
 interface ComponentData {
-  data: QRCode | null;
+  data: string | null;
   cameraFeedVideoElement: HTMLVideoElement | null;
 }
 
