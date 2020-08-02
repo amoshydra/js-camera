@@ -2,12 +2,12 @@
   <div>
     <CameraFeed
       autoplay
-      @ready="cameraFeedVideoElement = $event"
+      @ready="el => this.cameraFeedVideoElement = el"
     />
     <QrReader
       :disabled="disabled"
       :videoElement="cameraFeedVideoElement"
-      @change="$emit('change', $event)"
+      @change="data => $emit('change', data)"
     />
   </div>
 </template>
