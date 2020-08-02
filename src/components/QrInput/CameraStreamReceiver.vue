@@ -1,5 +1,9 @@
 <template>
   <div>
+    <CameraStreamConfigurator
+      v-model="videoStreamConstraints"
+      @input="getCamera"
+    />
     <slot v-bind="slotData"/>
   </div>
 </template>
@@ -7,6 +11,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { CameraStreamReceiverSlotData } from './CameraStreamReceiver.lib';
+import CameraStreamConfigurator from './CameraStreamConfigurator.vue';
 
 interface ComponentData {
   error: Error | null;
@@ -16,6 +21,10 @@ interface ComponentData {
 }
 
 export default Vue.extend({
+  components: {
+    CameraStreamConfigurator,
+  },
+
   data(): ComponentData {
     return {
       error: null,
@@ -27,12 +36,6 @@ export default Vue.extend({
         height: { ideal: 480 }
       },
     };
-  },
-
-  watch: {
-    videoStreamConstraints(constrain) {
-      this.getCamera(constrain);
-    }
   },
 
   mounted() {
