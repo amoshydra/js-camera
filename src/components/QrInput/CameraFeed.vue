@@ -1,93 +1,42 @@
 <template>
-  <video
-    v-if="!error"
-    class="video"
+  <CameraStreamReceiver
+    v-slot="{ stream, error }"
+  >
+    <CameraFeedErrorPresenter
+      v-if="mediaDevicesSupportError || error"
+      :error="mediaDevicesSupportError || error"
+    />
 
-    ref="video"
-    autoplay
-    @loadeddata="loadeddata"
-  />
-
-  <CameraFeedErrorPresenter
-    :error="error"
-    v-else
-  />
+    <CameraVideo
+      v-else
+      :stream="stream"
+      @ready="videoEl => $emit('ready', videoEl)"
+    />
+  </CameraStreamReceiver>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+
+import CameraVideo from './CameraVideo.vue';
 import CameraFeedErrorPresenter from './CameraFeedErrorPresenter.vue';
+import CameraStreamReceiver from './CameraStreamReceiver.vue';
 
 export default Vue.extend({
   components: {
+    CameraVideo,
+    CameraStreamReceiver,
     CameraFeedErrorPresenter,
   },
 
-  props: {
-    width: {
-      type: Number,
-      default: 640,
-    },
-    height: {
-      type: Number,
-      default: 480,
-    },
-    facingMode: {
-      type: String,
-      default: 'environment',
-    },
-  },
-
-  data() {
-    return {
-      error: null as Error | null,
-    };
-  },
-
-  async mounted() {
-    await this.getCamera();
-  },
-
-  methods: {
-    async getCamera(): Promise<void> {
-      this.error = null;
-
-      if (!this.hasGetUserMedia) {
-        this.error = new Error('mediaDevices is not supported');
-        return;
-      }
-
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: this.facingMode,
-            width: { ideal: this.width },
-            height: { ideal: this.height }
-          },
-        });
-        const videoEl = (this.$refs.video as HTMLVideoElement);
-        videoEl.srcObject = stream;
-      } catch (error) {
-        this.error = error;
-      }
-    },
-
-    loadeddata() {
-      const videoEl = (this.$refs.video as HTMLVideoElement);
-      this.$emit('ready', videoEl);
-    }
-  },
-
   computed: {
-    hasGetUserMedia() {
+    hasGetUserMedia(): boolean {
       return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-    }
+    },
+
+    mediaDevicesSupportError(): Error | null {
+      return this.hasGetUserMedia ? null : new Error('mediaDevices is not supported');
+    },
   }
 });
 </script>
-
-<style scoped>
-.video {
-  width: 100%;
-}
-</style>
