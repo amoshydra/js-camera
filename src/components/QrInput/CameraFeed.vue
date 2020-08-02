@@ -1,6 +1,8 @@
 <template>
   <video
     v-if="!error"
+    class="video"
+
     ref="video"
     autoplay
     @loadeddata="loadeddata"
@@ -85,10 +87,7 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-.error {
-  border: 1em solid maroon;
-  padding-top: 3em;
-  padding-bottom: 3em;
-  box-sizing: border-box;
+.video {
+  width: 100%;
 }
 </style>

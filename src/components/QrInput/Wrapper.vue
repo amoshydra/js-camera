@@ -1,7 +1,6 @@
 <template>
   <div>
     <CameraFeed
-      class="video"
       autoplay
       @ready="cameraFeedVideoElement = $event"
     />
@@ -44,7 +43,5 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-.video {
-  width: 100%;
-}
+
 </style>
