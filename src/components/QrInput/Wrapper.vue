@@ -8,29 +8,22 @@
     <QrReader
       :disabled="disabled"
       :videoElement="cameraFeedVideoElement"
-      @change="data = $event"
-    />
-    <ContentRenderer
-      v-if="data"
-      :data="data"
+      @change="$emit('change', $event)"
     />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import ContentRenderer from './ContentRenderer.vue'
 import QrReader from './QrReader.vue'
 import CameraFeed from './CameraFeed.vue'
 
 interface ComponentData {
-  data: string | null;
   cameraFeedVideoElement: HTMLVideoElement | null;
 }
 
 export default Vue.extend({
   components: {
-    ContentRenderer,
     QrReader,
     CameraFeed,
   },
@@ -44,7 +37,6 @@ export default Vue.extend({
 
   data(): ComponentData {
     return {
-      data: null,
       cameraFeedVideoElement: null,
     };
   },

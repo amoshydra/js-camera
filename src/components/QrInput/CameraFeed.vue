@@ -41,22 +41,26 @@ export default Vue.extend({
   },
 
   async mounted() {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: this.facingMode,
-          width: { ideal: this.width },
-          height: { ideal: this.height }
-        },
-      });
-      const videoEl = (this.$refs.video as HTMLVideoElement);
-      videoEl.srcObject = stream;
-    } catch (error) {
-      this.hasError = true;
-    }
+    await this.getCamera();
   },
 
   methods: {
+    async getCamera(): Promise<void> {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: this.facingMode,
+            width: { ideal: this.width },
+            height: { ideal: this.height }
+          },
+        });
+        const videoEl = (this.$refs.video as HTMLVideoElement);
+        videoEl.srcObject = stream;
+      } catch (error) {
+        this.hasError = true;
+      }
+    },
+
     loadeddata() {
       const videoEl = (this.$refs.video as HTMLVideoElement);
       this.$emit('ready', videoEl);

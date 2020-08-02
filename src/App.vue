@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import QrScanner from './components/qr-scanner.vue'
+import QrScanner from '@/pages/Scanner.vue'
 
 export default Vue.extend({
   name: 'App',
