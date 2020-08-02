@@ -30,6 +30,7 @@ export default Vue.extend({
   padding-top: 3em;
   padding-bottom: 3em;
   box-sizing: border-box;
+  text-align: center;
 }
 
 .icon {

@@ -12,12 +12,13 @@
 import Vue from 'vue';
 import { CameraStreamReceiverSlotData } from './CameraStreamReceiver.lib';
 import CameraStreamConfigurator from './CameraStreamConfigurator.vue';
+import { VideoStreamConstrain } from './ConfigurationStorage';
 
 interface ComponentData {
   error: Error | null;
   stream: MediaStream | null;
 
-  videoStreamConstraints: MediaStreamConstraints['video'];
+  videoStreamConstraints: VideoStreamConstrain;
 }
 
 export default Vue.extend({
@@ -30,11 +31,7 @@ export default Vue.extend({
       error: null,
       stream: null,
 
-      videoStreamConstraints: {
-        facingMode: 'environment',
-        width: { ideal: 640 },
-        height: { ideal: 480 }
-      },
+      videoStreamConstraints: undefined,
     };
   },
 
