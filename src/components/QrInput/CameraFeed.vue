@@ -1,24 +1,26 @@
 <template>
   <video
-    v-if="!hasError && hasGetUserMedia"
+    v-if="!error"
     ref="video"
     autoplay
     @loadeddata="loadeddata"
   />
 
-  <div
-    class="error"
+  <CameraFeedErrorPresenter
+    :error="error"
     v-else
-  >
-    <div style="font-size: 5em; margin-bottom: 0.5em;">😟</div>
-    I cannot access to the camera.
-  </div>
+  />
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import CameraFeedErrorPresenter from './CameraFeedErrorPresenter.vue';
 
 export default Vue.extend({
+  components: {
+    CameraFeedErrorPresenter,
+  },
+
   props: {
     width: {
       type: Number,
@@ -36,7 +38,7 @@ export default Vue.extend({
 
   data() {
     return {
-      hasError: false,
+      error: null as Error | null,
     };
   },
 
@@ -46,6 +48,13 @@ export default Vue.extend({
 
   methods: {
     async getCamera(): Promise<void> {
+      this.error = null;
+
+      if (!this.hasGetUserMedia) {
+        this.error = new Error('mediaDevices is not supported');
+        return;
+      }
+
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: {
@@ -57,7 +66,7 @@ export default Vue.extend({
         const videoEl = (this.$refs.video as HTMLVideoElement);
         videoEl.srcObject = stream;
       } catch (error) {
-        this.hasError = true;
+        this.error = error;
       }
     },
 
