@@ -14,6 +14,8 @@ interface ComponentData {
   data: QRCode | null;
 }
 
+const wait = async (duration: number) => new Promise(r => setTimeout(r, duration));
+
 export default Vue.extend({
   props: {
     videoElement: {
@@ -56,6 +58,8 @@ export default Vue.extend({
 
   methods: {
     coordinateScanning(ctx: CanvasRenderingContext2D, videoElement: HTMLVideoElement) {
+      if (!this.canScan) return;
+
       ctx.drawImage(videoElement, 0, 0, videoElement.videoWidth, videoElement.videoHeight);
       const imageData = ctx.getImageData(0, 0, videoElement.videoWidth, videoElement.videoHeight);
 
@@ -67,6 +71,8 @@ export default Vue.extend({
           }
           resolve();
         })
+      }).catch((error) => {
+        console.error(error)
       })
     },
 
@@ -81,18 +87,21 @@ export default Vue.extend({
       ctx.canvas.height = videoElement.videoHeight;
       ctx.clearRect(0, 0, videoElement.videoWidth, videoElement.videoHeight);
 
-      const wait = async (duration: number) => new Promise(r => setTimeout(r, duration));
-
-      while(this.canScan) {
-        const start = performance.now();
-        await this.coordinateScanning(ctx, videoElement);
-        const diff = performance.now() - start;
-
-        if (diff < this.scanInterval) {
-          await wait(diff);
-        }
-      }
+      this.doScan(ctx, videoElement);
     },
+
+    async doScan(ctx: CanvasRenderingContext2D, videoElement: HTMLVideoElement) {
+      const start = performance.now();
+      await this.coordinateScanning(ctx, videoElement);
+      const diff = performance.now() - start;
+
+      const scanInterval = this.scanInterval;
+      if (diff < scanInterval) {
+        await wait(scanInterval - diff);
+      }
+
+      this.doScan(ctx, videoElement);
+    }
   },
 });
 </script>
