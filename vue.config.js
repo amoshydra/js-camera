@@ -2,7 +2,9 @@ const appTitle = 'QR Camera';
 
 // vue.config.js
 module.exports = {
-  // options...
+  // Allow public path to be configured to suit different deployment environment
+  publicPath: process.env.BUILD_PUBLIC_PATH,
+
   devServer: {
     disableHostCheck: true
   },
