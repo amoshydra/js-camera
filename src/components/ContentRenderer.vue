@@ -19,10 +19,6 @@
 <script lang="ts">
 import Vue from 'vue';
 
-interface ComponentData {
-  data: string | null;
-}
-
 export default Vue.extend({
   props: {
     data: {
