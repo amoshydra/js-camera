@@ -4,6 +4,7 @@
 
     ref="video"
     autoplay
+    playsinline
     @loadeddata="loadeddata"
   />
 </template>
