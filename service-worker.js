@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/js-camera/precache-manifest.41b8df891d47669cdac89357dda63ad0.js"
+  "/js-camera/precache-manifest.afe7a67501e72e6a906ae56042e2eaad.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "js-camera"});

@@ -1,19 +1,19 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "a3ddb8826dee3e1b6d71",
-    "url": "/js-camera/css/app.64e8678d.css"
+    "revision": "d053dde0e48980d942ba",
+    "url": "/js-camera/css/app.99d751c9.css"
   },
   {
-    "revision": "24f82c34e1b5d6b2762cac04a463cf7f",
+    "revision": "b7ff0879aac449eaaa10860b07a91815",
     "url": "/js-camera/index.html"
   },
   {
-    "revision": "a3ddb8826dee3e1b6d71",
-    "url": "/js-camera/js/app.78996d3c.js"
+    "revision": "d053dde0e48980d942ba",
+    "url": "/js-camera/js/app.05dacc68.js"
   },
   {
-    "revision": "0abee391d4b4d69dab16",
-    "url": "/js-camera/js/chunk-vendors.c62c4891.js"
+    "revision": "f90f8505a7147b1421a8",
+    "url": "/js-camera/js/chunk-vendors.885cd945.js"
   },
   {
     "revision": "53b1363dffdeaada98061f9f847a20b9",
