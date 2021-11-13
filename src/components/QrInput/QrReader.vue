@@ -63,7 +63,7 @@ export default Vue.extend({
       ctx.drawImage(videoElement, 0, 0, videoElement.videoWidth, videoElement.videoHeight);
       const imageData = ctx.getImageData(0, 0, videoElement.videoWidth, videoElement.videoHeight);
 
-      return new Promise((resolve) => {
+      return new Promise<void>((resolve) => {
         setTimeout(() => {
           const code = jsQr(imageData.data, videoElement.videoWidth, videoElement.videoHeight);
           if (code && code.data) {

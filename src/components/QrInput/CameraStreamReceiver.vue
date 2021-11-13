@@ -48,7 +48,7 @@ export default Vue.extend({
           video: videoStreamConstraints,
         });
       } catch (error) {
-        this.error = error;
+        this.error = error instanceof Error ? error : null;
         this.stream = null;
       }
     },
