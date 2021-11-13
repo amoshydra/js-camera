@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import QrInput from '@/components/QrInput/Wrapper.vue';
+import QrInput from '@/components/QrInput/QrInput.vue';
 import ContentRenderer from '@/components/ContentRenderer.vue'
 
 interface ComponentData {
