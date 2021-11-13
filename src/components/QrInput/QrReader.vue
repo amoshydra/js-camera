@@ -64,13 +64,13 @@ export default Vue.extend({
       const imageData = ctx.getImageData(0, 0, videoElement.videoWidth, videoElement.videoHeight);
 
       return new Promise<void>((resolve) => {
-        setTimeout(() => {
+        setImmediate(() => {
           const code = jsQr(imageData.data, videoElement.videoWidth, videoElement.videoHeight);
           if (code && code.data) {
             this.data = code;
           }
           resolve();
-        })
+        });
       }).catch((error) => {
         // eslint-disable-next-line no-console
         console.error(error)

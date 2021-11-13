@@ -1157,6 +1157,11 @@
     "@types/mime" "^1"
     "@types/node" "*"
 
+"@types/setimmediate@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@types/setimmediate/-/setimmediate-1.0.2.tgz#021a36f2cae266be8180a5b2aa233cd5884b5721"
+  integrity sha512-JHonWbepiR1pwiYVz2rOK4mWrhlUcrJQaOSaq4VYlfuhLrPlY1EayGjt0tXemCr8eBdVzvLeYejRCb/0Z/XuiQ==
+
 "@types/source-list-map@*":
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/@types/source-list-map/-/source-list-map-0.1.2.tgz#0078836063ffaf17412349bba364087e0ac02ec9"
@@ -7844,7 +7849,7 @@ set-value@^2.0.0, set-value@^2.0.1:
     is-plain-object "^2.0.3"
     split-string "^3.0.1"
 
-setimmediate@^1.0.4:
+setimmediate@^1.0.4, setimmediate@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/setimmediate/-/setimmediate-1.0.5.tgz#290cbb232e306942d7d7ea9b83732ab7856f8285"
   integrity sha1-KQy7Iy4waULX1+qbg3Mqt4VvgoU=
