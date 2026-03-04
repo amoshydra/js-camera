@@ -4,6 +4,16 @@
     class="canvas"
     ref="canvas"
   />
+  <div v-if="showDebug" class="debug-status">
+    <div>Video: {{ videoElement ? '✓' : '✗' }}</div>
+    <div>Ready: {{ isVideoReady }}</div>
+    <div>Playing: {{ isVideoPlaying }}</div>
+    <div>Dim: {{ videoWidth }}x{{ videoHeight }}</div>
+    <div>Scanning: {{ isScanning }}</div>
+    <div>Data: {{ data?.data || 'none' }}</div>
+    <div>Scans: {{ scanCount }}</div>
+    <div v-if="lastError">Error: {{ lastError }}</div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -12,12 +22,20 @@ import jsQr, { QRCode } from 'jsqr'
 
 interface ComponentData {
   data: QRCode | null
+  isVideoReady: boolean
+  isVideoPlaying: boolean
+  isScanning: boolean
+  debug: boolean
+  lastError: string | null
+  scanCount: number
 }
-
-const wait = async (duration: number) => new Promise(r => setTimeout(r, duration))
 
 export default defineComponent({
   props: {
+    debug: {
+      type: Boolean,
+      default: false,
+    },
     videoElement: {
       type: Object as () => HTMLVideoElement,
       default: null,
@@ -35,12 +53,28 @@ export default defineComponent({
   data(): ComponentData {
     return {
       data: null,
+      isVideoReady: false,
+      isVideoPlaying: false,
+      isScanning: false,
+      debug: false,
+      lastError: null,
+      scanCount: 0,
     }
   },
 
   computed: {
+    showDebug(): boolean {
+      if (this.debug) return true
+      return new URLSearchParams(window.location.search).get('debug') === 'true'
+    },
     canScan(): boolean {
-      return !this.disabled && !!this.videoElement
+      return !this.disabled && !!this.videoElement && this.isVideoReady && this.isVideoPlaying
+    },
+    videoWidth(): number {
+      return this.videoElement?.videoWidth ?? 0
+    },
+    videoHeight(): number {
+      return this.videoElement?.videoHeight ?? 0
     }
   },
 
@@ -50,15 +84,29 @@ export default defineComponent({
     },
 
     videoElement(videoElement: HTMLVideoElement | null): void {
-      if (!videoElement) return
+      if (!videoElement) {
+        this.isVideoReady = false
+        this.isVideoPlaying = false
+        return
+      }
+
+      const initVideo = () => {
+        this.isVideoReady = true
+        if (videoElement.readyState >= 2) {
+          this.setupCanvas(videoElement)
+        }
+      }
 
       if (videoElement.readyState >= 2) {
-        this.setupCanvas(videoElement)
+        initVideo()
       } else {
-        videoElement.addEventListener('loadedmetadata', () => {
-          this.setupCanvas(videoElement)
-        }, { once: true })
+        videoElement.addEventListener('loadedmetadata', initVideo, { once: true })
       }
+
+      videoElement.addEventListener('playing', () => {
+        this.isVideoPlaying = true
+        this.setupCanvas(videoElement)
+      }, { once: true })
     },
   },
 
@@ -70,20 +118,22 @@ export default defineComponent({
         return
       }
 
+      this.scanCount++
+
       ctx.drawImage(videoElement, 0, 0, videoElement.videoWidth, videoElement.videoHeight)
       const imageData = ctx.getImageData(0, 0, videoElement.videoWidth, videoElement.videoHeight)
 
-      return new Promise<void>((resolve) => {
-        setImmediate(() => {
-          const code = jsQr(imageData.data, videoElement.videoWidth, videoElement.videoHeight)
-          if (code && code.data) {
-            this.data = code
-          }
-          resolve()
-        })
-      }).catch((error) => {
-        console.error(error)
-      })
+      try {
+        const code = jsQr(imageData.data, videoElement.videoWidth, videoElement.videoHeight)
+        if (code && code.data) {
+          this.data = code
+          this.lastError = null
+        } else {
+          this.lastError = 'No QR found'
+        }
+      } catch (e) {
+        this.lastError = String(e)
+      }
     },
 
     async setupCanvas(videoElement: HTMLVideoElement) {
@@ -100,21 +150,21 @@ export default defineComponent({
       this.doScan(ctx, videoElement)
     },
 
-    async doScan(ctx: CanvasRenderingContext2D, videoElement: HTMLVideoElement) {
-      if (this.disabled) return
+    doScan(ctx: CanvasRenderingContext2D, videoElement: HTMLVideoElement) {
+      if (this.disabled) {
+        this.isScanning = false
+        return
+      }
 
-      const start = performance.now()
-      await this.coordinateScanning(ctx, videoElement)
-      const diff = performance.now() - start
+      this.isScanning = true
+      this.coordinateScanning(ctx, videoElement)
 
       const scanInterval = this.scanInterval
-      if (diff < scanInterval) {
-        await wait(scanInterval - diff)
-      }
-
-      if (!this.disabled) {
-        this.doScan(ctx, videoElement)
-      }
+      setTimeout(() => {
+        if (!this.disabled) {
+          this.doScan(ctx, videoElement)
+        }
+      }, scanInterval)
     }
   },
 })
@@ -123,5 +173,18 @@ export default defineComponent({
 <style scoped lang="scss">
 .canvas {
   width: 100%;
+}
+
+.debug-status {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.8);
+  color: lime;
+  padding: 10px;
+  font-family: monospace;
+  font-size: 12px;
+  z-index: 9999;
 }
 </style>
