@@ -4,21 +4,24 @@
     class="canvas"
     ref="canvas"
   />
-  <div v-if="showDebug" class="debug-status">
-    <div>Video: {{ videoElement ? '✓' : '✗' }}</div>
-    <div>Ready: {{ isVideoReady }}</div>
-    <div>Playing: {{ isVideoPlaying }}</div>
-    <div>Dim: {{ videoWidth }}x{{ videoHeight }}</div>
-    <div>Scanning: {{ isScanning }}</div>
-    <div>Data: {{ data?.data || 'none' }}</div>
-    <div>Scans: {{ scanCount }}</div>
-    <div v-if="lastError">Error: {{ lastError }}</div>
-  </div>
+  <QrReaderDebug
+    v-if="showDebug"
+    :videoElement="videoElement"
+    :isVideoReady="isVideoReady"
+    :isVideoPlaying="isVideoPlaying"
+    :isScanning="isScanning"
+    :videoWidth="videoWidth"
+    :videoHeight="videoHeight"
+    :data="data?.data ?? null"
+    :scanCount="scanCount"
+    :lastError="lastError"
+  />
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
 import jsQr, { QRCode } from 'jsqr'
+import QrReaderDebug from './QrReaderDebug.vue'
 
 interface ComponentData {
   data: QRCode | null
@@ -31,6 +34,10 @@ interface ComponentData {
 }
 
 export default defineComponent({
+  components: {
+    QrReaderDebug,
+  },
+
   props: {
     debug: {
       type: Boolean,
@@ -170,21 +177,8 @@ export default defineComponent({
 })
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 .canvas {
   width: 100%;
-}
-
-.debug-status {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(0, 0, 0, 0.8);
-  color: lime;
-  padding: 10px;
-  font-family: monospace;
-  font-size: 12px;
-  z-index: 9999;
 }
 </style>
