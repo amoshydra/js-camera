@@ -1,24 +1,31 @@
 # js-camera
 
-## Project setup
-```
+A web-based QR code scanner.
+
+## Demo
+
+https://amoshydra.github.io/js-camera/
+
+## Setup
+
+```bash
 pnpm install
 ```
 
-### Compiles and hot-reloads for development
-```
+## Development
+
+```bash
 pnpm serve
 ```
 
-### Compiles and minifies for production
-```
+## Build
+
+```bash
 pnpm build
 ```
 
-### Lints and fixes files
-```
+## Lint
+
+```bash
 pnpm lint
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
