@@ -10,7 +10,7 @@
       v-if="showConfiguratorUi"
 
       :value="value"
-      @input="updateConfig"
+      @update:modelValue="updateConfig"
       @close="showConfiguratorUi = false"
     />
 

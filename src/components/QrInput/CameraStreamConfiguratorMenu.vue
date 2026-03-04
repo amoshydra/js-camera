@@ -113,7 +113,7 @@ export default defineComponent({
     updateValue(payload: MediaTrackConstraints) {
       const originalvalue = (typeof this.value === 'object') ? this.value : ConfigurationStorage.defaultConfig
 
-      this.$emit('input', {
+      this.$emit('update:modelValue', {
         ...originalvalue,
         ...payload,
       })

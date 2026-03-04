@@ -52,13 +52,23 @@ export default defineComponent({
     videoElement(videoElement: HTMLVideoElement | null): void {
       if (!videoElement) return
 
-      this.setupCanvas(videoElement)
+      if (videoElement.readyState >= 2) {
+        this.setupCanvas(videoElement)
+      } else {
+        videoElement.addEventListener('loadedmetadata', () => {
+          this.setupCanvas(videoElement)
+        }, { once: true })
+      }
     },
   },
 
   methods: {
     coordinateScanning(ctx: CanvasRenderingContext2D, videoElement: HTMLVideoElement) {
       if (!this.canScan) return
+
+      if (videoElement.videoWidth === 0 || videoElement.videoHeight === 0) {
+        return
+      }
 
       ctx.drawImage(videoElement, 0, 0, videoElement.videoWidth, videoElement.videoHeight)
       const imageData = ctx.getImageData(0, 0, videoElement.videoWidth, videoElement.videoHeight)
@@ -91,6 +101,8 @@ export default defineComponent({
     },
 
     async doScan(ctx: CanvasRenderingContext2D, videoElement: HTMLVideoElement) {
+      if (this.disabled) return
+
       const start = performance.now()
       await this.coordinateScanning(ctx, videoElement)
       const diff = performance.now() - start
@@ -100,7 +112,9 @@ export default defineComponent({
         await wait(scanInterval - diff)
       }
 
-      this.doScan(ctx, videoElement)
+      if (!this.disabled) {
+        this.doScan(ctx, videoElement)
+      }
     }
   },
 })

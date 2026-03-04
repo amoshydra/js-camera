@@ -7,7 +7,7 @@
     <QrReader
       :disabled="disabled"
       :videoElement="cameraFeedVideoElement"
-      @change="(data: any) => $emit('change', data)"
+      @change="$emit('change', $event)"
     />
   </div>
 </template>
