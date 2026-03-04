@@ -9,6 +9,7 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
     },
   },
+  base: process.env.BUILD_PUBLIC_PATH,
   server: {
     host: true,
     allowedHosts: true,
