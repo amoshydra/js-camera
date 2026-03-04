@@ -45,8 +45,8 @@ export default defineComponent({
   },
 
   watch: {
-    data({ data: newData }: { data: QRCode | null }) {
-      this.$emit('change', newData)
+    data(newData: QRCode | null) {
+      this.$emit('change', newData?.data ?? null)
     },
 
     videoElement(videoElement: HTMLVideoElement | null): void {
