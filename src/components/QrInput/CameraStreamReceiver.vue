@@ -2,7 +2,6 @@
   <div>
     <CameraStreamConfigurator
       v-model="videoStreamConstraints"
-      @input="getCamera"
     />
     <slot v-bind="slotData"/>
   </div>
@@ -10,8 +9,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { CameraStreamReceiverSlotData } from './CameraStreamReceiver.lib'
 import CameraStreamConfigurator from './CameraStreamConfigurator.vue'
+import { CameraStreamReceiverSlotData } from './CameraStreamReceiver.lib'
 import { VideoStreamConstrain } from './ConfigurationStorage'
 
 interface ComponentData {
@@ -39,9 +38,22 @@ export default defineComponent({
     this.getCamera(this.videoStreamConstraints)
   },
 
+  watch: {
+    videoStreamConstraints: {
+      handler(newConstraints: VideoStreamConstrain) {
+        this.getCamera(newConstraints)
+      },
+      deep: true,
+    },
+  },
+
   methods: {
     async getCamera(videoStreamConstraints: MediaStreamConstraints['video']): Promise<void> {
       this.error = null
+
+      if (this.stream) {
+        this.stream.getTracks().forEach(track => track.stop())
+      }
 
       try {
         this.stream = await navigator.mediaDevices.getUserMedia({

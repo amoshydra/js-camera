@@ -6,7 +6,6 @@
     >⚙</button>
 
     <CameraStreamConfiguratorMenu
-      ref="configurator"
       :class="$style.configurator"
       v-if="showConfiguratorUi"
 
@@ -19,10 +18,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import CameraStreamConfiguratorMenu from './CameraStreamConfiguratorMenu.vue'
-import { configStore } from './CameraStreamConfigurator.lib'
-import { VideoStreamConstrain } from './ConfigurationStorage'
+import { defineComponent } from 'vue';
+import { configStore } from './CameraStreamConfigurator.lib';
+import CameraStreamConfiguratorMenu from './CameraStreamConfiguratorMenu.vue';
+import { VideoStreamConstrain } from './ConfigurationStorage';
 
 export default defineComponent({
   components: {
@@ -61,7 +60,7 @@ export default defineComponent({
     },
 
     emitConfig() {
-      this.$emit('input', configStore.load())
+      this.$emit('update:modelValue', configStore.load())
     },
 
     handleBackgroundClick(event: Event): void {
