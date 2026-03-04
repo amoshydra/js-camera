@@ -17,9 +17,9 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent } from 'vue'
 
-export default Vue.extend({
+export default defineComponent({
   props: {
     data: {
       type: String,
@@ -29,14 +29,14 @@ export default Vue.extend({
   computed: {
     isUrl() {
       try {
-        new URL(this.data)
-        return true;
+        new URL(this.data as string)
+        return true
       } catch (error) {
-        return false;
+        return false
       }
     },
   }
-});
+})
 </script>
 
 <style lang="scss">

@@ -12,15 +12,15 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import QrInput from '@/components/QrInput/QrInput.vue';
+import { defineComponent } from 'vue'
+import QrInput from '@/components/QrInput/QrInput.vue'
 import ContentRenderer from '@/components/ContentRenderer.vue'
 
 interface ComponentData {
-  data: string | null;
+  data: string | null
 }
 
-export default Vue.extend({
+export default defineComponent({
   components: {
     QrInput,
     ContentRenderer,
@@ -36,7 +36,7 @@ export default Vue.extend({
   data(): ComponentData {
     return {
       data: null,
-    };
+    }
   },
-});
+})
 </script>

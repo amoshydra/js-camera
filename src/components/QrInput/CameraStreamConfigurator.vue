@@ -19,19 +19,19 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from 'vue';
-import CameraStreamConfiguratorMenu from './CameraStreamConfiguratorMenu.vue';
+import { defineComponent } from 'vue'
+import CameraStreamConfiguratorMenu from './CameraStreamConfiguratorMenu.vue'
 import { configStore } from './CameraStreamConfigurator.lib'
-import { VideoStreamConstrain } from './ConfigurationStorage';
+import { VideoStreamConstrain } from './ConfigurationStorage'
 
-export default Vue.extend({
+export default defineComponent({
   components: {
     CameraStreamConfiguratorMenu,
   },
 
   props: {
     value: {
-      type: Object as PropType<VideoStreamConstrain>,
+      type: Object as () => VideoStreamConstrain,
       default: undefined,
     }
   },
@@ -43,38 +43,38 @@ export default Vue.extend({
   },
 
   created() {
-    this.emitConfig();
+    this.emitConfig()
   },
 
   mounted() {
     window.addEventListener('click', this.handleBackgroundClick)
   },
 
-  beforeDestroy() {
+  beforeUnmount() {
     window.removeEventListener('click', this.handleBackgroundClick)
   },
 
   methods: {
     updateConfig(config: VideoStreamConstrain) {
-      configStore.store(config);
-      this.emitConfig();
+      configStore.store(config)
+      this.emitConfig()
     },
 
     emitConfig() {
-      this.$emit('input', configStore.load());
+      this.$emit('input', configStore.load())
     },
 
     handleBackgroundClick(event: Event): void {
-      if (!this.showConfiguratorUi) return;
+      if (!this.showConfiguratorUi) return
 
-      if (event.composedPath().find(x => x === this.$el)) {
-        return;
+      if ((event.composedPath() as any[]).find(x => x === this.$el)) {
+        return
       }
 
-      this.showConfiguratorUi = false;
+      this.showConfiguratorUi = false
     }
   },
-});
+})
 </script>
 
 <style module>

@@ -10,38 +10,38 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent } from 'vue'
 
-export default Vue.extend({
+export default defineComponent({
   props: {
     stream: {
-      type: MediaStream,
+      type: Object as () => MediaStream,
       default: null,
     }
   },
 
   watch: {
     stream(stream: MediaStream | null) {
-      this.updateStream(stream);
+      this.updateStream(stream)
     },
   },
 
   mounted() {
-    this.updateStream(this.stream);
+    this.updateStream(this.stream as MediaStream | null)
   },
 
   methods: {
     loadeddata() {
-      const videoEl = (this.$refs.video as HTMLVideoElement);
-      this.$emit('ready', videoEl);
+      const videoEl = (this.$refs.video as HTMLVideoElement)
+      this.$emit('ready', videoEl)
     },
 
     updateStream(stream: MediaStream | null) {
-      const videoEl = (this.$refs.video as HTMLVideoElement);
-      videoEl.srcObject = stream;
+      const videoEl = (this.$refs.video as HTMLVideoElement)
+      videoEl.srcObject = stream
     },
   },
-});
+})
 </script>
 
 <style scoped>

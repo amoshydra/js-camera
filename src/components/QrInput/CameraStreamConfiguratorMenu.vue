@@ -49,25 +49,25 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from 'vue';
-import { VideoStreamConstrain, ConfigurationStorage } from './ConfigurationStorage';
+import { defineComponent, PropType } from 'vue'
+import { VideoStreamConstrain, ConfigurationStorage } from './ConfigurationStorage'
 
-type InputName = 'videoSource' | 'orientation';
+type InputName = 'videoSource' | 'orientation'
 
-const extractOrGetFirst = <T extends unknown>(itemOrArrayOfItems: T | T[]): T => Array.isArray(itemOrArrayOfItems) ? itemOrArrayOfItems[0] : itemOrArrayOfItems;
+const extractOrGetFirst = <T extends unknown>(itemOrArrayOfItems: T | T[]): T => Array.isArray(itemOrArrayOfItems) ? itemOrArrayOfItems[0] : itemOrArrayOfItems
 const extractConfig = <T extends MediaTrackConstraints>(constrain: undefined | T | boolean, key: keyof T): string | null => {
-  if (typeof constrain !== 'object') return null;
+  if (typeof constrain !== 'object') return null
 
-  const firstDeviceId = extractOrGetFirst(constrain[key]);
+  const firstDeviceId = extractOrGetFirst(constrain[key])
 
-  if (!firstDeviceId) return null;
+  if (!firstDeviceId) return null
 
-  if (typeof firstDeviceId === 'string') return firstDeviceId;
+  if (typeof firstDeviceId === 'string') return firstDeviceId
 
-  return extractOrGetFirst((firstDeviceId as ConstrainDOMStringParameters).exact ?? (firstDeviceId as ConstrainDOMStringParameters).ideal ?? null);
+  return extractOrGetFirst((firstDeviceId as ConstrainDOMStringParameters).exact ?? (firstDeviceId as ConstrainDOMStringParameters).ideal ?? null)
 }
 
-export default Vue.extend({
+export default defineComponent({
   props: {
     value: {
       type: Object as PropType<VideoStreamConstrain>,
@@ -82,16 +82,16 @@ export default Vue.extend({
   },
 
   async mounted() {
-    this.devices = (await navigator.mediaDevices.enumerateDevices()).filter(({ kind }) => kind === 'videoinput');
+    this.devices = (await navigator.mediaDevices.enumerateDevices()).filter(({ kind }) => kind === 'videoinput')
   },
 
   computed: {
     selectedDeviceId(): string | null {
-      return extractConfig(this.value, 'deviceId');
+      return extractConfig(this.value as VideoStreamConstrain, 'deviceId')
     },
 
     selectedFacingMode(): string | null {
-      return extractConfig(this.value, 'facingMode');
+      return extractConfig(this.value as VideoStreamConstrain, 'facingMode')
     },
   },
 
@@ -101,25 +101,25 @@ export default Vue.extend({
         const selectEl = event.target as HTMLSelectElement
         this.updateValue({
           deviceId: selectEl.value
-        });
+        })
       } else if (inputName === 'orientation') {
         const radioEl = event.target as HTMLInputElement
         this.updateValue({
           facingMode: radioEl.value
-        });
+        })
       }
     },
 
     updateValue(payload: MediaTrackConstraints) {
-      const originalvalue = (typeof this.value === 'object') ? this.value : ConfigurationStorage.defaultConfig;
+      const originalvalue = (typeof this.value === 'object') ? this.value : ConfigurationStorage.defaultConfig
 
       this.$emit('input', {
         ...originalvalue,
         ...payload,
-      });
+      })
     }
   }
-});
+})
 </script>
 
 <style module>

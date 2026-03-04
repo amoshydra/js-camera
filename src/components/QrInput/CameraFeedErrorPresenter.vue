@@ -6,22 +6,22 @@
     <div :class="$style.friendlyMessage">I cannot access to the camera.</div>
 
     <div :class="$style.errorMessage">
-      {{ error.message }}
+      {{ error?.message }}
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent } from 'vue'
 
-export default Vue.extend({
+export default defineComponent({
   props: {
     error: {
-      type: Error,
+      type: Object as () => Error,
       default: undefined,
     },
   },
-});
+})
 </script>
 
 <style module>

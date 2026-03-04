@@ -7,10 +7,10 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent } from 'vue'
 import QrScanner from '@/pages/QrScanner.vue'
 
-export default Vue.extend({
+export default defineComponent({
   name: 'App',
   components: {
     QrScanner,
@@ -19,19 +19,19 @@ export default Vue.extend({
   data() {
     return {
       disabled: false
-    };
+    }
   },
 
   mounted() {
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') {
-        this.disabled = true;
+        this.disabled = true
       } else if (document.visibilityState === 'visible') {
-        this.disabled = false;
+        this.disabled = false
       }
-    });
+    })
   },
-});
+})
 </script>
 
 <style lang="scss">

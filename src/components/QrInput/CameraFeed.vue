@@ -10,19 +10,19 @@
     <CameraVideo
       v-else
       :stream="stream"
-      @ready="videoEl => $emit('ready', videoEl)"
+      @ready="(videoEl: HTMLVideoElement) => $emit('ready', videoEl)"
     />
   </CameraStreamReceiver>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import { defineComponent } from 'vue'
 
-import CameraVideo from './CameraVideo.vue';
-import CameraFeedErrorPresenter from './CameraFeedErrorPresenter.vue';
-import CameraStreamReceiver from './CameraStreamReceiver.vue';
+import CameraVideo from './CameraVideo.vue'
+import CameraFeedErrorPresenter from './CameraFeedErrorPresenter.vue'
+import CameraStreamReceiver from './CameraStreamReceiver.vue'
 
-export default Vue.extend({
+export default defineComponent({
   components: {
     CameraVideo,
     CameraStreamReceiver,
@@ -31,12 +31,12 @@ export default Vue.extend({
 
   computed: {
     hasGetUserMedia(): boolean {
-      return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+      return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)
     },
 
     mediaDevicesSupportError(): Error | null {
-      return this.hasGetUserMedia ? null : new Error('mediaDevices is not supported');
+      return this.hasGetUserMedia ? null : new Error('mediaDevices is not supported')
     },
   }
-});
+})
 </script>
