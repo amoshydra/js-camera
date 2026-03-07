@@ -15,7 +15,7 @@ export default function QrInput({ disabled = false, onChange }: QrInputProps) {
   return (
     <div>
       <CameraFeed
-        autoplay
+        _autoplay
         onReady={setCameraFeedVideoElement}
       />
       <QrReader
