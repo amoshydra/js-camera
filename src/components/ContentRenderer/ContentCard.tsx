@@ -1,42 +1,43 @@
-import { css } from '~styled-system/css';
+import { css, cx } from '~styled-system/css';
 
 interface ContentCardProps {
   value: string;
   isUrl: boolean;
+  className?: string;
 }
 
-export default function ContentCard({ value, isUrl }: ContentCardProps) {
+export default function ContentCard({ value, isUrl, className }: ContentCardProps) {
   return (
-    <div className={cssWrapper}>
-      <div className={cssContent}>
-        {isUrl ? (
-          <a
-            className={`${cssContentAnchor} ${cssContentText}`}
-            href={value}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {value}
-          </a>
-        ) : (
-          <pre className={cssContentText}>{value}</pre>
-        )}
-      </div>
+    <div className={cx(cssContent, className)}>
+      {isUrl ? (
+        <a
+          className={`${cssContentAnchor} ${cssContentText}`}
+          href={value}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {value}
+        </a>
+      ) : (
+        <pre className={cssContentText}>{value}</pre>
+      )}
     </div>
   );
 }
 
-const cssWrapper = css({
-  padding: 2,
-});
-
 const cssContent = css({
-  padding: 4,
+  paddingY: 4,
+  paddingX: 4,
   borderRadius: 'lg',
   background: 'stone.950',
+  width: 'full',
+  overflow: 'auto',
+  overscrollBehavior: 'none',
 });
 
-const cssContentText = css({});
+const cssContentText = css({
+  wordBreak: 'break-word',
+});
 
 const cssContentAnchor = css({
   display: 'inline-block',

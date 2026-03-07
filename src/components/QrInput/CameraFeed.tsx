@@ -43,4 +43,6 @@ const cssWrapper = css({
   width: '100%',
   background: 'slate.800',
   position: 'relative',
+  borderRadius: 'xl',
+  overflow: 'hidden',
 });

@@ -1,3 +1,4 @@
+import ScannedIndicator from '@/components/ScannedIndicator';
 import { type QRCode } from 'jsqr';
 import { useState } from 'react';
 import { css } from '~styled-system/css';
@@ -12,16 +13,37 @@ export default function QrScanner({ disabled = false }: QrScannerProps) {
   const [data, setData] = useState<QRCode | null>(null);
 
   return (
-    <div className={cssWrapper}>
-      <QrInput
-        disabled={disabled}
-        onChange={setData}
-      />
-      <ContentRenderer data={data} />
-    </div>
+    <>
+      <ScannedIndicator data={data} />
+      <div className={cssWrapper}>
+        <QrInput
+          disabled={disabled}
+          onChange={setData}
+          className={cssTop}
+        />
+        <ContentRenderer
+          data={data}
+          className={cssBottom}
+        />
+      </div>
+    </>
   );
 }
 
 const cssWrapper = css({
-  paddingTop: 'env(safe-area-inset-top)',
+  marginTop: 'env(safe-area-inset-top)',
+  marginBottom: 'env(safe-area-inset-bottom)',
+  padding: 4,
+  display: 'flex',
+  flexDirection: 'column',
+  height: 'full',
+  minHeight: 0,
+});
+const cssTop = css({
+  flexGrow: 0,
+  flexShrink: 1,
+});
+const cssBottom = css({
+  flexGrow: 1,
+  flexShrink: 0,
 });

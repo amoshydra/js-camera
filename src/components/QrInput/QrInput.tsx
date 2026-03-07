@@ -1,20 +1,22 @@
 import { type QRCode } from 'jsqr';
 import { useState } from 'react';
+import { cx } from '~styled-system/css';
 import CameraFeed from './CameraFeed';
 import QrReader from './QrReader';
 
 interface QrInputProps {
   disabled?: boolean;
   onChange?: (data: QRCode | null) => void;
+  className?: string;
 }
 
-export default function QrInput({ disabled = false, onChange }: QrInputProps) {
+export default function QrInput({ disabled = false, onChange, className }: QrInputProps) {
   const [cameraFeedVideoElement, setCameraFeedVideoElement] = useState<HTMLVideoElement | null>(
     null,
   );
 
   return (
-    <div>
+    <div className={cx(className)}>
       <CameraFeed onReady={setCameraFeedVideoElement} />
       <QrReader
         disabled={disabled}

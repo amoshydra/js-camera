@@ -1,11 +1,12 @@
 import { type QRCode } from 'jsqr';
-import { css } from '~styled-system/css';
+import { css, cx } from '~styled-system/css';
 import ContentAction from './ContentAction';
 import ContentCard from './ContentCard';
 import { useLastGoodValue } from './useLastGoodValue';
 
 interface ContentRendererProps {
   data: QRCode | null;
+  className?: string;
 }
 
 function checkIsUrl(data: string): boolean {
@@ -17,43 +18,45 @@ function checkIsUrl(data: string): boolean {
   }
 }
 
-export default function ContentRenderer({ data }: ContentRendererProps) {
-  const value = useLastGoodValue(data?.data);
+export default function ContentRenderer({ data, className }: ContentRendererProps) {
+  const d = data?.data;
+  const value = useLastGoodValue(d);
   const isUrl = value ? checkIsUrl(value) : false;
 
-  return (
-    <div className={cssWrapper}>
-      <div
-        className={cssIndicator}
-        key={data ? data.location.topLeftCorner.x : 'idle'}
-      />
+  if (!value) return;
 
-      {value && (
-        <div>
-          <ContentAction
-            value={value}
-            isUrl={isUrl}
-          />
-          <ContentCard
-            value={value}
-            isUrl={isUrl}
-          />
-        </div>
-      )}
+  return (
+    <div className={cx(cssWrapper, className)}>
+      <ContentCard
+        className={cssTop}
+        value={value}
+        isUrl={isUrl}
+      />
+      <ContentAction
+        className={cssBottom}
+        value={value}
+        isUrl={isUrl}
+      />
     </div>
   );
 }
 
 const cssWrapper = css({
-  display: 'grid',
+  display: 'flex',
+  flexDirection: 'column',
+  marginTop: 2,
   gap: 2,
+  minHeight: 0,
 });
 
-const cssIndicator = css({
-  borderColor: 'green.800',
-  borderStyle: 'dashed',
-  borderWidth: 2,
-  width: 'full',
-  opacity: 0,
-  animation: 'successIndicator 0.25s ease',
+const cssTop = css({
+  flexGrow: 1,
+  flexShrink: 0,
+  minHeight: 0,
+  flexBasis: 0,
+});
+const cssBottom = css({
+  flexGrow: 0,
+  flexShrink: 1,
+  minHeight: 0,
 });

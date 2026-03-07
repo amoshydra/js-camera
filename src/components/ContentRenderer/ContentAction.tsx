@@ -1,12 +1,13 @@
-import { css } from '~styled-system/css';
+import { css, cx } from '~styled-system/css';
 import { styled } from '~styled-system/jsx';
 
 interface ContentActionProps {
   value: string;
   isUrl: boolean;
+  className?: string;
 }
 
-export default function ContentAction({ value, isUrl }: ContentActionProps) {
+export default function ContentAction({ value, isUrl, className }: ContentActionProps) {
   const canShare = navigator.canShare;
   const handleCopy = () => {
     navigator.clipboard.writeText(value);
@@ -19,7 +20,7 @@ export default function ContentAction({ value, isUrl }: ContentActionProps) {
   };
 
   return (
-    <div className={cssWrapper}>
+    <div className={cx(cssWrapper, className)}>
       <Button onClick={handleCopy}>Copy</Button>
       {canShare && <Button onClick={handleShare}>Share</Button>}
     </div>
@@ -29,17 +30,18 @@ export default function ContentAction({ value, isUrl }: ContentActionProps) {
 const cssWrapper = css({
   padding: 2,
   display: 'flex',
-  justifyContent: 'center',
+  justifyContent: 'flex-end',
   alignItems: 'center',
-  gap: 4,
+  gap: 2,
 });
 
 const Button = styled('button', {
   base: {
+    display: 'block',
     paddingY: 2,
-    paddingX: 4,
+    paddingX: 8,
     background: 'stone.900',
-    borderRadius: 'full',
+    borderRadius: 'lg',
     '@media(hover: hover)': {
       _hover: {
         background: 'stone.800',
