@@ -1,3 +1,7 @@
+# Panda CSS
+styled-system/
+.panda/
+
 .DS_Store
 node_modules
 /dist
