@@ -1,4 +1,4 @@
-import { useState, useEffect, FormEvent } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { css } from '../../../styled-system/css';
 import { VideoStreamConstrain } from './ConfigurationStorage';
 
@@ -107,7 +107,7 @@ export default function CameraStreamConfiguratorMenu({
           <h5>Video source</h5>
           <select
             className={cssInput}
-            onInput={(e) => handleInput('videoSource', e)}
+            onChange={(e) => handleInput('videoSource', e)}
           >
             <option
               key="default"
@@ -135,7 +135,7 @@ export default function CameraStreamConfiguratorMenu({
             name="orientation"
             checked={selectedFacingMode === 'user'}
             value="user"
-            onInput={(e) => handleInput('orientation', e)}
+            onChange={(e) => handleInput('orientation', e)}
           />
           Front
         </label>
@@ -145,7 +145,7 @@ export default function CameraStreamConfiguratorMenu({
             name="orientation"
             checked={selectedFacingMode === 'environment'}
             value="environment"
-            onInput={(e) => handleInput('orientation', e)}
+            onChange={(e) => handleInput('orientation', e)}
           />
           Back
         </label>

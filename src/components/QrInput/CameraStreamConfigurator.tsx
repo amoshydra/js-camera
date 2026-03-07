@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { css } from '../../../styled-system/css';
 import { configStore } from './CameraStreamConfigurator.lib';
 import CameraStreamConfiguratorMenu from './CameraStreamConfiguratorMenu';
@@ -20,25 +20,10 @@ export default function CameraStreamConfigurator({
     onUpdateModelValue?.(configStore.load());
   };
 
-  useEffect(() => {
-    onUpdateModelValue?.(configStore.load());
-  }, [onUpdateModelValue]);
-
-  useEffect(() => {
-    const handleBackgroundClick = (_event: MouseEvent): void => {
-      if (!showConfiguratorUi) return;
-      setShowConfiguratorUi(false);
-    };
-    window.addEventListener('click', handleBackgroundClick);
-    return () => {
-      window.removeEventListener('click', handleBackgroundClick);
-    };
-  }, [showConfiguratorUi]);
-
   return (
     <div className={cssWrapper}>
       <button
-        onClick={() => setShowConfiguratorUi(!showConfiguratorUi)}
+        onClick={() => setShowConfiguratorUi((v) => !v)}
         className={cssButton}
       >
         ⚙
@@ -57,10 +42,10 @@ export default function CameraStreamConfigurator({
 }
 
 const cssWrapper = css({
-  position: 'absolute',
+  position: 'relative',
   right: '0',
   top: '0',
-  zIndex: '1',
+  zIndex: '10',
 });
 
 const cssButton = css({

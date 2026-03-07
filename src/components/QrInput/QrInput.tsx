@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import QrReader from './QrReader';
 import CameraFeed from './CameraFeed';
+import QrReader from './QrReader';
 
 interface QrInputProps {
   disabled?: boolean;
@@ -14,10 +14,7 @@ export default function QrInput({ disabled = false, onChange }: QrInputProps) {
 
   return (
     <div>
-      <CameraFeed
-        _autoplay
-        onReady={setCameraFeedVideoElement}
-      />
+      <CameraFeed onReady={setCameraFeedVideoElement} />
       <QrReader
         disabled={disabled}
         videoElement={cameraFeedVideoElement}
