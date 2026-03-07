@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { css } from '../../../styled-system/css';
+import { css } from '~styled-system/css';
 
 interface CameraVideoProps {
   stream: MediaStream | null;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { css } from '../styled-system/css';
+import { css } from '~styled-system/css';
 import QrScanner from './pages/QrScanner';
 
 const globalStyles = css({

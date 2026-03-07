@@ -1,6 +1,6 @@
 import jsQR, { QRCode } from 'jsqr';
 import { useEffect, useRef, useState } from 'react';
-import { css } from '../../../styled-system/css';
+import { css } from '~styled-system/css';
 import QrReaderDebug from './QrReaderDebug';
 
 interface QrReaderProps {

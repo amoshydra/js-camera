@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { css } from '../../../styled-system/css';
+import { css } from '~styled-system/css';
 import { VideoStreamConstrain } from './ConfigurationStorage';
 
 interface CameraStreamConfiguratorMenuProps {
