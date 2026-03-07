@@ -5,8 +5,8 @@ const STORAGE_KEY = 'video_stream_constrain';
 export class ConfigurationStorage {
   static defaultConfig: MediaTrackConstraints = {
     facingMode: 'environment',
-    width: { ideal: 1280 },
-    height: { ideal: 960 },
+    width: { ideal: 1024 },
+    height: { ideal: 1024 },
   };
 
   config: VideoStreamConstrain;

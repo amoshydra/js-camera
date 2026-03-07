@@ -3,7 +3,6 @@ import { css } from '~styled-system/css';
 interface QrReaderDebugProps {
   videoElement: HTMLVideoElement | null;
   isVideoReady: boolean;
-  isVideoPlaying: boolean;
   isScanning: boolean;
   videoWidth: number;
   videoHeight: number;
@@ -12,23 +11,10 @@ interface QrReaderDebugProps {
   lastError: string | null;
 }
 
-const cssDebugStatus = css({
-  position: 'fixed',
-  bottom: '0',
-  left: '0',
-  right: '0',
-  background: 'rgba(0, 0, 0, 0.8)',
-  color: 'lime',
-  padding: '10px',
-  fontFamily: 'monospace',
-  fontSize: '12px',
-  zIndex: '9999',
-});
 
 export default function QrReaderDebug({
   videoElement,
   isVideoReady,
-  isVideoPlaying,
   isScanning,
   videoWidth,
   videoHeight,
@@ -40,7 +26,6 @@ export default function QrReaderDebug({
     <div className={cssDebugStatus}>
       <div>Video: {videoElement ? '✓' : '✗'}</div>
       <div>Ready: {isVideoReady ? 'true' : 'false'}</div>
-      <div>Playing: {isVideoPlaying ? 'true' : 'false'}</div>
       <div>
         Dim: {videoWidth}x{videoHeight}
       </div>
@@ -51,3 +36,11 @@ export default function QrReaderDebug({
     </div>
   );
 }
+
+const cssDebugStatus = css({
+  background: 'rgba(0, 0, 0, 0.8)',
+  color: 'lime',
+  padding: '10px',
+  fontFamily: 'monospace',
+  fontSize: '12px',
+});

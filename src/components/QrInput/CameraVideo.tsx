@@ -1,14 +1,14 @@
 import { useEffect, useRef } from 'react';
-import { css } from '~styled-system/css';
+import { css, cx } from '~styled-system/css';
 
 interface CameraVideoProps {
   stream: MediaStream | null;
   onReady?: (videoEl: HTMLVideoElement) => void;
+  className?: string;
 }
 
-const cssVideo = css({ width: '100%' });
 
-export default function CameraVideo({ stream, onReady }: CameraVideoProps) {
+export default function CameraVideo({ stream, onReady, className }: CameraVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -28,10 +28,17 @@ export default function CameraVideo({ stream, onReady }: CameraVideoProps) {
   return (
     <video
       ref={videoRef}
-      className={cssVideo}
+      className={cx(cssVideo, className)}
       autoPlay
       playsInline
       onLoadedData={handleLoadedData}
     />
   );
 }
+
+const cssVideo = css({
+  width: '100%',
+  aspectRatio: "1 / 1",
+  background: 'slate.800',
+  objectFit: 'contain',
+});

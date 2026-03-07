@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { css } from '../../../styled-system/css';
+import { css, cx } from '~styled-system/css';
 import { configStore } from './CameraStreamConfigurator.lib';
 import CameraStreamConfiguratorMenu from './CameraStreamConfiguratorMenu';
 import { VideoStreamConstrain } from './ConfigurationStorage';
@@ -7,11 +7,13 @@ import { VideoStreamConstrain } from './ConfigurationStorage';
 interface CameraStreamConfiguratorProps {
   value?: VideoStreamConstrain;
   onUpdateModelValue?: (value: VideoStreamConstrain) => void;
+  className?: string;
 }
 
 export default function CameraStreamConfigurator({
   value,
   onUpdateModelValue,
+  className,
 }: CameraStreamConfiguratorProps) {
   const [showConfiguratorUi, setShowConfiguratorUi] = useState(false);
 
@@ -21,7 +23,7 @@ export default function CameraStreamConfigurator({
   };
 
   return (
-    <div className={cssWrapper}>
+    <div className={cx(cssWrapper, className)}>
       <button
         onClick={() => setShowConfiguratorUi((v) => !v)}
         className={cssButton}
@@ -42,10 +44,10 @@ export default function CameraStreamConfigurator({
 }
 
 const cssWrapper = css({
-  position: 'relative',
+  position: 'absolute',
   right: '0',
   top: '0',
-  zIndex: '10',
+  zIndex: '1',
 });
 
 const cssButton = css({

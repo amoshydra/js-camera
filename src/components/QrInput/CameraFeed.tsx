@@ -1,3 +1,4 @@
+import { css } from '~styled-system/css';
 import CameraFeedErrorPresenter from './CameraFeedErrorPresenter';
 import CameraStreamConfigurator from './CameraStreamConfigurator';
 import { useCameraStreamReceiver } from './CameraStreamReceiver.hook';
@@ -7,7 +8,7 @@ interface CameraFeedProps {
   onReady?: (videoEl: HTMLVideoElement) => void;
 }
 
-function _CameraFeed({ onReady }: CameraFeedProps) {
+export default function CameraFeed({ onReady }: CameraFeedProps) {
   const hasGetUserMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
   const mediaDevicesSupportError = hasGetUserMedia
     ? null
@@ -25,7 +26,7 @@ function _CameraFeed({ onReady }: CameraFeedProps) {
   }
 
   return (
-    <div>
+    <div className={cssWrapper}>
       <CameraStreamConfigurator
         value={videoStreamConstraints}
         onUpdateModelValue={onVideoStreamContrainsChange}
@@ -38,6 +39,8 @@ function _CameraFeed({ onReady }: CameraFeedProps) {
   );
 }
 
-export default function CameraFeed(props: CameraFeedProps) {
-  return <_CameraFeed {...props} />;
-}
+const cssWrapper = css({
+  width: '100%',
+  background: 'slate.800',
+  position: "relative",
+});
