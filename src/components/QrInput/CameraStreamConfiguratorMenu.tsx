@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { css } from '~styled-system/css';
 import { VideoStreamConstrain } from './ConfigurationStorage';
 
@@ -33,30 +33,6 @@ const extractConfig = <T extends MediaTrackConstraints>(
   );
 };
 
-const cssWrapper = css({
-  backgroundColor: 'rgba(255,255,255,0.95)',
-  boxShadow: '8px 8px 32px rgba(0,0,0,0.2)',
-  borderRadius: '0.25rem',
-  padding: '1em',
-  paddingTop: '2em',
-  paddingBottom: '2em',
-});
-
-const cssButton = css({
-  position: 'absolute',
-  top: '0',
-  right: '0',
-  padding: '0.5rem',
-  fontSize: '1rem',
-  backgroundColor: 'rgba(0, 0, 0, 0)',
-  border: 'none',
-});
-
-const cssInput = css({
-  maxWidth: '100%',
-  padding: '0.6rem 0.2rem',
-});
-
 export default function CameraStreamConfiguratorMenu({
   className,
   value,
@@ -76,7 +52,7 @@ export default function CameraStreamConfiguratorMenu({
 
   const handleInput = (
     inputName: InputName,
-    event: FormEvent<HTMLSelectElement | HTMLInputElement>,
+    event: ChangeEvent<HTMLSelectElement | HTMLInputElement>,
   ) => {
     if (inputName === 'videoSource') {
       const selectEl = event.currentTarget;
@@ -102,8 +78,8 @@ export default function CameraStreamConfiguratorMenu({
         ❌
       </button>
 
-      <form>
-        <label>
+      <form className={css({ display: 'grid', gap: 4 })}>
+        <label className={cssFieldGroup}>
           <h5>Video source</h5>
           <select
             className={cssInput}
@@ -128,28 +104,63 @@ export default function CameraStreamConfiguratorMenu({
           </select>
         </label>
 
-        <h5>Facing</h5>
-        <label>
-          <input
-            type="radio"
-            name="orientation"
-            checked={selectedFacingMode === 'user'}
-            value="user"
-            onChange={(e) => handleInput('orientation', e)}
-          />
-          Front
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="orientation"
-            checked={selectedFacingMode === 'environment'}
-            value="environment"
-            onChange={(e) => handleInput('orientation', e)}
-          />
-          Back
-        </label>
+        <fieldset className={cssFieldGroup}>
+          <legend>Facing</legend>
+          <div className={css({ marginTop: 2 })}>
+            <label className={cssFieldRadio}>
+              <input
+                type="radio"
+                name="orientation"
+                checked={selectedFacingMode === 'user'}
+                value="user"
+                onChange={(e) => handleInput('orientation', e)}
+              />
+              Front
+            </label>
+            <label className={cssFieldRadio}>
+              <input
+                type="radio"
+                name="orientation"
+                checked={selectedFacingMode === 'environment'}
+                value="environment"
+                onChange={(e) => handleInput('orientation', e)}
+              />
+              Back
+            </label>
+          </div>
+        </fieldset>
       </form>
     </div>
   );
 }
+
+const cssWrapper = css({
+  padding: '1em',
+  paddingTop: '2em',
+  paddingBottom: '2em',
+});
+
+const cssButton = css({
+  position: 'absolute',
+  top: '0',
+  right: '0',
+  padding: '0.5rem',
+  fontSize: '1rem',
+  backgroundColor: 'rgba(0, 0, 0, 0)',
+  border: 'none',
+});
+
+const cssInput = css({
+  maxWidth: '100%',
+  padding: '0.6rem 0.2rem',
+});
+
+const cssFieldGroup = css({
+  display: 'grid',
+  rowGap: 2,
+});
+
+const cssFieldRadio = css({
+  display: 'flex',
+  gap: 1,
+});

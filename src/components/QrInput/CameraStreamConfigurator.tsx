@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { css, cx } from '~styled-system/css';
+import Dialog from '../Dialog/Dialog';
 import { configStore } from './CameraStreamConfigurator.lib';
 import CameraStreamConfiguratorMenu from './CameraStreamConfiguratorMenu';
 import { VideoStreamConstrain } from './ConfigurationStorage';
@@ -32,12 +33,17 @@ export default function CameraStreamConfigurator({
       </button>
 
       {showConfiguratorUi && (
-        <CameraStreamConfiguratorMenu
+        <Dialog
           className={cssConfigurator}
-          value={value}
-          onUpdateModelValue={updateConfig}
+          open={showConfiguratorUi}
           onClose={() => setShowConfiguratorUi(false)}
-        />
+        >
+          <CameraStreamConfiguratorMenu
+            value={value}
+            onUpdateModelValue={updateConfig}
+            onClose={() => setShowConfiguratorUi(false)}
+          />
+        </Dialog>
       )}
     </div>
   );
@@ -59,10 +65,12 @@ const cssButton = css({
 });
 
 const cssConfigurator = css({
-  position: 'absolute',
-  right: '0',
-  top: '0',
-  margin: '0.4em',
-  width: 'calc(100vw - 0px - 0.8em)',
+  width: 'full',
   boxSizing: 'border-box',
+  placeSelf: 'start end',
+  margin: 2,
+  borderRadius: 'sm',
+  color: 'white',
+  backgroundColor: 'rgba(0, 0, 0, 0.85)',
+  boxShadow: '8px 8px 32px rgba(0,0,0,0.2)',
 });
