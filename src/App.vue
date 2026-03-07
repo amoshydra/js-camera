@@ -1,9 +1,7 @@
 <template>
-  <div id="app">
-    <QrScanner
-      :disabled="disabled"
-    />
-  </div>
+  <QrScanner
+    :disabled="disabled"
+  />
 </template>
 
 <script lang="ts">
