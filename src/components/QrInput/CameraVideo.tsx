@@ -31,6 +31,7 @@ export default function CameraVideo({ stream, onReady, className }: CameraVideoP
       className={cx(cssVideo, className)}
       autoPlay
       playsInline
+      muted
       onLoadedData={handleLoadedData}
     />
   );
