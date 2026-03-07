@@ -1,7 +1,7 @@
-import { useState, useEffect, ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import CameraStreamConfigurator from './CameraStreamConfigurator';
 import { CameraStreamReceiverSlotData } from './CameraStreamReceiver.lib';
-import { VideoStreamConstrain } from './ConfigurationStorage';
+import { ConfigurationStorage, VideoStreamConstrain } from './ConfigurationStorage';
 
 interface CameraStreamReceiverProps {
   renderSlot?: (slotData: CameraStreamReceiverSlotData) => ReactNode;
@@ -11,32 +11,33 @@ interface CameraStreamReceiverProps {
 export default function CameraStreamReceiver({ renderSlot, children }: CameraStreamReceiverProps) {
   const [error, setError] = useState<Error | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
-  const [videoStreamConstraints, setVideoStreamConstraints] =
-    useState<VideoStreamConstrain>(undefined);
+  const [videoStreamConstraints, setVideoStreamConstraints] = useState<VideoStreamConstrain>(
+    () => ConfigurationStorage.defaultConfig,
+  );
 
   useEffect(() => {
+    const getCamera = async (
+      videoStreamConstraints: MediaStreamConstraints['video'],
+    ): Promise<void> => {
+      setError(null);
+
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
+
+      try {
+        const newStream = await navigator.mediaDevices.getUserMedia({
+          video: videoStreamConstraints,
+        });
+        setStream(newStream);
+      } catch (err) {
+        setError(err instanceof Error ? err : null);
+        setStream(null);
+      }
+    };
+
     getCamera(videoStreamConstraints);
-  }, [videoStreamConstraints]);
-
-  const getCamera = async (
-    videoStreamConstraints: MediaStreamConstraints['video'],
-  ): Promise<void> => {
-    setError(null);
-
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-    }
-
-    try {
-      const newStream = await navigator.mediaDevices.getUserMedia({
-        video: videoStreamConstraints,
-      });
-      setStream(newStream);
-    } catch (err) {
-      setError(err instanceof Error ? err : null);
-      setStream(null);
-    }
-  };
+  }, [stream, videoStreamConstraints]);
 
   const slotData: CameraStreamReceiverSlotData =
     error !== null
