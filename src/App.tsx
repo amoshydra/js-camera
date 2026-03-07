@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
 import { css } from '~styled-system/css';
+import { useDocumentVisibilityChange } from './hooks/useVisibilityChange';
 import QrScanner from './pages/QrScanner';
 
 const globalStyles = css({
@@ -9,29 +9,14 @@ const globalStyles = css({
 });
 
 export default function App() {
-  const [disabled, setDisabled] = useState(false);
-
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
-        setDisabled(true);
-      } else if (document.visibilityState === 'visible') {
-        setDisabled(false);
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, []);
+  const documentVisible = useDocumentVisibilityChange();
 
   return (
     <div
       className={globalStyles}
       id="app"
     >
-      <QrScanner disabled={disabled} />
+      <QrScanner disabled={documentVisible} />
     </div>
   );
 }
