@@ -6,4 +6,15 @@ export default defineConfig({
   exclude: [],
   outdir: 'styled-system',
   jsxFramework: 'react',
+  theme: {
+    extend: {
+      keyframes: {
+        successIndicator: {
+          '0%': { opacity: 1 },
+          '50%': { opacity: 1 },
+          '100%': { opacity: 1 },
+        },
+      },
+    },
+  },
 });

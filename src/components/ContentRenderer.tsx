@@ -30,28 +30,52 @@ export default function ContentRenderer({ data: _data }: ContentRendererProps) {
   const url = isUrl(data);
 
   return (
-    <div className={cssContent}>
-      {url ? (
-        <a
-          className={`${cssContentAnchor} ${cssContentText}`}
-          href={data}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {data}
-        </a>
-      ) : (
-        <div className={cssContentText}>{data}</div>
-      )}
-    </div>
+    <>
+      <div
+        className={cssIndicator}
+        key={_data ? _data.location.topLeftCorner.x : 'idle'}
+      />
+      <div className={cssWrapper}>
+        <div className={cssContent}>
+          {url ? (
+            <a
+              className={`${cssContentAnchor} ${cssContentText}`}
+              href={data}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {data}
+            </a>
+          ) : (
+            <pre className={cssContentText}>{data}</pre>
+          )}
+        </div>
+      </div>
+    </>
   );
 }
 
-const cssContent = css({ padding: '1em' });
-
-const cssContentText = css({
-  marginBottom: '2em',
+const cssWrapper = css({
+  padding: 2,
+  marginTop: 2,
 });
+
+const cssContent = css({
+  padding: 4,
+  borderRadius: 'lg',
+  background: 'stone.950',
+});
+
+const cssIndicator = css({
+  borderColor: 'green.800',
+  borderStyle: 'dashed',
+  borderWidth: 2,
+  width: 'full',
+  opacity: 0,
+  animation: 'successIndicator 0.25s ease',
+});
+
+const cssContentText = css({});
 
 const cssContentAnchor = css({
   display: 'inline-block',
