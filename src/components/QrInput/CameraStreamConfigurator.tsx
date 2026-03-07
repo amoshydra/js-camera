@@ -59,7 +59,7 @@ export default function CameraStreamConfigurator({
     onUpdateModelValue?.(configStore.load());
   };
 
-  const handleBackgroundClick = (event: MouseEvent): void => {
+  const handleBackgroundClick = (_event: MouseEvent): void => {
     if (!showConfiguratorUi) return;
     setShowConfiguratorUi(false);
   };
