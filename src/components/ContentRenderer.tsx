@@ -41,7 +41,7 @@ export default function ContentRenderer({ data }: ContentRendererProps) {
           className={`${cssContentAnchor} ${cssContentText}`}
           href={data}
           target="_blank"
-          rel="noopener"
+          rel="noopener noreferrer"
         >
           {data}
         </a>

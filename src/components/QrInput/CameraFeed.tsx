@@ -3,10 +3,9 @@ import CameraStreamReceiver from './CameraStreamReceiver';
 import CameraVideo from './CameraVideo';
 
 export default function CameraFeed({
-  autoplay,
   onReady,
 }: {
-  autoplay?: boolean;
+  _autoplay?: boolean;
   onReady?: (videoEl: HTMLVideoElement) => void;
 }) {
   const hasGetUserMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
