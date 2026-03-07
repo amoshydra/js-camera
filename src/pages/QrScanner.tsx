@@ -1,7 +1,7 @@
 import { type QRCode } from 'jsqr';
 import { useState } from 'react';
 import { css } from '~styled-system/css';
-import ContentRenderer from '../components/ContentRenderer';
+import ContentRenderer from '../components/ContentRenderer/ContentRenderer';
 import QrInput from '../components/QrInput/QrInput';
 
 interface QrScannerProps {
