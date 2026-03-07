@@ -1,7 +1,9 @@
+import { type QRCode } from 'jsqr';
+import { useRef } from 'react';
 import { css } from '~styled-system/css';
 
 interface ContentRendererProps {
-  data: string | null;
+  data: QRCode | null;
 }
 
 const cssContent = css({ padding: '1em' });
@@ -29,7 +31,16 @@ function isUrl(data: string): boolean {
   }
 }
 
-export default function ContentRenderer({ data }: ContentRendererProps) {
+export default function ContentRenderer({ data: _data }: ContentRendererProps) {
+  const lastGoodData = useRef('');
+  if (_data && _data.data) {
+    lastGoodData.current = _data.data;
+    if (navigator.vibrate) {
+      navigator.vibrate([20]);
+    }
+  }
+
+  const data = lastGoodData.current;
   if (!data) return null;
 
   const url = isUrl(data);

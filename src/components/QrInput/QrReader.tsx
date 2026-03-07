@@ -8,7 +8,7 @@ interface QrReaderProps {
   videoElement: HTMLVideoElement | null;
   scanInterval?: number;
   disabled?: boolean;
-  onChange?: (data: string | null) => void;
+  onChange?: (data: QRCode | null) => void;
 }
 
 export default function QrReader({
@@ -19,7 +19,6 @@ export default function QrReader({
   onChange,
 }: QrReaderProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [data, setData] = useState<QRCode | null>(null);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
@@ -59,11 +58,11 @@ export default function QrReader({
 
       try {
         const code = jsQR(imageData.data, video.videoWidth, video.videoHeight);
-        if (code && code.data) {
-          setData(code);
-          onChange?.(code.data ?? null);
+        if (code) {
+          onChange?.(code);
           setLastError(null);
         } else {
+          onChange?.(null);
           setLastError('No QR found');
         }
       } catch (e) {
@@ -80,7 +79,7 @@ export default function QrReader({
       setIsScanning(true);
       coordinateScanning(ctx, video);
 
-      setInterval(() => {
+      setTimeout(() => {
         if (!disabled) {
           doScan(ctx, video);
         }
@@ -125,7 +124,6 @@ export default function QrReader({
           isScanning={isScanning}
           videoWidth={videoElement?.videoWidth ?? 0}
           videoHeight={videoElement?.videoHeight ?? 0}
-          data={data?.data ?? null}
           scanCount={scanCount}
           lastError={lastError}
         />

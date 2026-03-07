@@ -1,10 +1,11 @@
+import { type QRCode } from 'jsqr';
 import { useState } from 'react';
 import CameraFeed from './CameraFeed';
 import QrReader from './QrReader';
 
 interface QrInputProps {
   disabled?: boolean;
-  onChange?: (data: string | null) => void;
+  onChange?: (data: QRCode | null) => void;
 }
 
 export default function QrInput({ disabled = false, onChange }: QrInputProps) {

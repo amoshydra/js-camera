@@ -6,7 +6,6 @@ interface QrReaderDebugProps {
   isScanning: boolean;
   videoWidth: number;
   videoHeight: number;
-  data: string | null;
   scanCount: number;
   lastError: string | null;
 }
@@ -17,7 +16,6 @@ export default function QrReaderDebug({
   isScanning,
   videoWidth,
   videoHeight,
-  data,
   scanCount,
   lastError,
 }: QrReaderDebugProps) {
@@ -29,7 +27,6 @@ export default function QrReaderDebug({
         Dim: {videoWidth}x{videoHeight}
       </div>
       <div>Scanning: {isScanning ? 'true' : 'false'}</div>
-      <div>Data: {data || 'none'}</div>
       <div>Scans: {scanCount}</div>
       {lastError && <div>Error: {lastError}</div>}
     </div>
