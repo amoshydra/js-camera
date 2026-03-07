@@ -1,14 +1,16 @@
-import { useRef, useState } from 'react'
-import QrReader from './QrReader'
-import CameraFeed from './CameraFeed'
+import { useRef, useState } from 'react';
+import QrReader from './QrReader';
+import CameraFeed from './CameraFeed';
 
 interface QrInputProps {
-  disabled?: boolean
-  onChange?: (data: string | null) => void
+  disabled?: boolean;
+  onChange?: (data: string | null) => void;
 }
 
 export default function QrInput({ disabled = false, onChange }: QrInputProps) {
-  const [cameraFeedVideoElement, setCameraFeedVideoElement] = useState<HTMLVideoElement | null>(null)
+  const [cameraFeedVideoElement, setCameraFeedVideoElement] = useState<HTMLVideoElement | null>(
+    null,
+  );
 
   return (
     <div>
@@ -22,5 +24,5 @@ export default function QrInput({ disabled = false, onChange }: QrInputProps) {
         onChange={onChange}
       />
     </div>
-  )
+  );
 }

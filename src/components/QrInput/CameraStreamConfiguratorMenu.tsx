@@ -1,37 +1,37 @@
-import { useState, useEffect, FormEvent } from 'react'
-import { css } from '../../../styled-system/css'
-import { VideoStreamConstrain, ConfigurationStorage } from './ConfigurationStorage'
+import { useState, useEffect, FormEvent } from 'react';
+import { css } from '../../../styled-system/css';
+import { VideoStreamConstrain, ConfigurationStorage } from './ConfigurationStorage';
 
 interface CameraStreamConfiguratorMenuProps {
-  className?: string
-  value: VideoStreamConstrain
-  onUpdateModelValue?: (value: VideoStreamConstrain) => void
-  onClose?: () => void
+  className?: string;
+  value: VideoStreamConstrain;
+  onUpdateModelValue?: (value: VideoStreamConstrain) => void;
+  onClose?: () => void;
 }
 
-type InputName = 'videoSource' | 'orientation'
+type InputName = 'videoSource' | 'orientation';
 
 const extractOrGetFirst = <T,>(itemOrArrayOfItems: T | T[]): T =>
-  Array.isArray(itemOrArrayOfItems) ? itemOrArrayOfItems[0] : itemOrArrayOfItems
+  Array.isArray(itemOrArrayOfItems) ? itemOrArrayOfItems[0] : itemOrArrayOfItems;
 
 const extractConfig = <T extends MediaTrackConstraints>(
   constrain: undefined | T | boolean,
-  key: keyof T
+  key: keyof T,
 ): string | null => {
-  if (typeof constrain !== 'object') return null
+  if (typeof constrain !== 'object') return null;
 
-  const firstDeviceId = extractOrGetFirst(constrain[key])
+  const firstDeviceId = extractOrGetFirst(constrain[key]);
 
-  if (!firstDeviceId) return null
+  if (!firstDeviceId) return null;
 
-  if (typeof firstDeviceId === 'string') return firstDeviceId
+  if (typeof firstDeviceId === 'string') return firstDeviceId;
 
   return extractOrGetFirst(
     (firstDeviceId as ConstrainDOMStringParameters).exact ??
       (firstDeviceId as ConstrainDOMStringParameters).ideal ??
-      null
-  )
-}
+      null,
+  );
+};
 
 const cssWrapper = css({
   backgroundColor: 'rgba(255,255,255,0.95)',
@@ -40,7 +40,7 @@ const cssWrapper = css({
   padding: '1em',
   paddingTop: '2em',
   paddingBottom: '2em',
-})
+});
 
 const cssButton = css({
   position: 'absolute',
@@ -50,12 +50,12 @@ const cssButton = css({
   fontSize: '1rem',
   backgroundColor: 'rgba(0, 0, 0, 0)',
   border: 'none',
-})
+});
 
 const cssInput = css({
   maxWidth: '100%',
   padding: '0.6rem 0.2rem',
-})
+});
 
 export default function CameraStreamConfiguratorMenu({
   className,
@@ -63,38 +63,42 @@ export default function CameraStreamConfiguratorMenu({
   onUpdateModelValue,
   onClose,
 }: CameraStreamConfiguratorMenuProps) {
-  const [devices, setDevices] = useState<MediaDeviceInfo[]>([])
+  const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
 
   useEffect(() => {
-    navigator.mediaDevices
-      .enumerateDevices()
-      .then((deviceList) => {
-        setDevices(deviceList.filter(({ kind }) => kind === 'videoinput'))
-      })
-  }, [])
+    navigator.mediaDevices.enumerateDevices().then((deviceList) => {
+      setDevices(deviceList.filter(({ kind }) => kind === 'videoinput'));
+    });
+  }, []);
 
-  const selectedDeviceId = extractConfig(value as VideoStreamConstrain, 'deviceId')
-  const selectedFacingMode = extractConfig(value as VideoStreamConstrain, 'facingMode')
+  const selectedDeviceId = extractConfig(value as VideoStreamConstrain, 'deviceId');
+  const selectedFacingMode = extractConfig(value as VideoStreamConstrain, 'facingMode');
 
-  const handleInput = (inputName: InputName, event: FormEvent<HTMLSelectElement | HTMLInputElement>) => {
+  const handleInput = (
+    inputName: InputName,
+    event: FormEvent<HTMLSelectElement | HTMLInputElement>,
+  ) => {
     if (inputName === 'videoSource') {
-      const selectEl = event.currentTarget
+      const selectEl = event.currentTarget;
       onUpdateModelValue?.({
         ...(value as object),
         deviceId: selectEl.value,
-      } as VideoStreamConstrain)
+      } as VideoStreamConstrain);
     } else if (inputName === 'orientation') {
-      const radioEl = event.currentTarget
+      const radioEl = event.currentTarget;
       onUpdateModelValue?.({
         ...(value as object),
         facingMode: radioEl.value,
-      } as VideoStreamConstrain)
+      } as VideoStreamConstrain);
     }
-  }
+  };
 
   return (
     <div className={`${cssWrapper} ${className || ''}`}>
-      <button onClick={onClose} className={cssButton}>
+      <button
+        onClick={onClose}
+        className={cssButton}
+      >
         ❌
       </button>
 
@@ -147,5 +151,5 @@ export default function CameraStreamConfiguratorMenu({
         </label>
       </form>
     </div>
-  )
+  );
 }

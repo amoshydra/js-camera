@@ -8,4 +8,6 @@ interface CameraStreamReceiverSlotDataGeneric {
   stream: MediaStream | null;
 }
 
-export type CameraStreamReceiverSlotData = CameraStreamReceiverSlotDataGeneric | CameraStreamReceiverSlotDataFailed;
+export type CameraStreamReceiverSlotData =
+  | CameraStreamReceiverSlotDataGeneric
+  | CameraStreamReceiverSlotDataFailed;

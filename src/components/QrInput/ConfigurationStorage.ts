@@ -6,8 +6,8 @@ export class ConfigurationStorage {
   static defaultConfig: MediaTrackConstraints = {
     facingMode: 'environment',
     width: { ideal: 640 },
-    height: { ideal: 480 }
-  }
+    height: { ideal: 480 },
+  };
 
   config: VideoStreamConstrain;
 

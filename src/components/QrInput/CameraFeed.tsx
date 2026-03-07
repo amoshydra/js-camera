@@ -1,16 +1,18 @@
-import CameraFeedErrorPresenter from './CameraFeedErrorPresenter'
-import CameraStreamReceiver from './CameraStreamReceiver'
-import CameraVideo from './CameraVideo'
+import CameraFeedErrorPresenter from './CameraFeedErrorPresenter';
+import CameraStreamReceiver from './CameraStreamReceiver';
+import CameraVideo from './CameraVideo';
 
 export default function CameraFeed({
   autoplay,
   onReady,
 }: {
-  autoplay?: boolean
-  onReady?: (videoEl: HTMLVideoElement) => void
+  autoplay?: boolean;
+  onReady?: (videoEl: HTMLVideoElement) => void;
 }) {
-  const hasGetUserMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)
-  const mediaDevicesSupportError = hasGetUserMedia ? null : new Error('mediaDevices is not supported')
+  const hasGetUserMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+  const mediaDevicesSupportError = hasGetUserMedia
+    ? null
+    : new Error('mediaDevices is not supported');
 
   return (
     <CameraStreamReceiver
@@ -29,5 +31,5 @@ export default function CameraFeed({
         </>
       )}
     />
-  )
+  );
 }

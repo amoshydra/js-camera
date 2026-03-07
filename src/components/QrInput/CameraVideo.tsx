@@ -1,29 +1,29 @@
-import { useRef, useEffect } from 'react'
-import { css } from '../../../styled-system/css'
+import { useRef, useEffect } from 'react';
+import { css } from '../../../styled-system/css';
 
 interface CameraVideoProps {
-  stream: MediaStream | null
-  onReady?: (videoEl: HTMLVideoElement) => void
+  stream: MediaStream | null;
+  onReady?: (videoEl: HTMLVideoElement) => void;
 }
 
-const cssVideo = css({ width: '100%' })
+const cssVideo = css({ width: '100%' });
 
 export default function CameraVideo({ stream, onReady }: CameraVideoProps) {
-  const videoRef = useRef<HTMLVideoElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    const videoEl = videoRef.current
-    if (!videoEl) return
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
 
-    videoEl.srcObject = stream
-  }, [stream])
+    videoEl.srcObject = stream;
+  }, [stream]);
 
   const handleLoadedData = () => {
-    const videoEl = videoRef.current
+    const videoEl = videoRef.current;
     if (videoEl) {
-      onReady?.(videoEl)
+      onReady?.(videoEl);
     }
-  }
+  };
 
   return (
     <video
@@ -33,5 +33,5 @@ export default function CameraVideo({ stream, onReady }: CameraVideoProps) {
       playsInline
       onLoadedData={handleLoadedData}
     />
-  )
+  );
 }

@@ -1,46 +1,42 @@
-import { useState, useEffect, ReactNode } from 'react'
-import CameraStreamConfigurator from './CameraStreamConfigurator'
-import { CameraStreamReceiverSlotData } from './CameraStreamReceiver.lib'
-import { VideoStreamConstrain } from './ConfigurationStorage'
+import { useState, useEffect, ReactNode } from 'react';
+import CameraStreamConfigurator from './CameraStreamConfigurator';
+import { CameraStreamReceiverSlotData } from './CameraStreamReceiver.lib';
+import { VideoStreamConstrain } from './ConfigurationStorage';
 
 interface CameraStreamReceiverProps {
-  renderSlot?: (slotData: CameraStreamReceiverSlotData) => ReactNode
-  children?: ReactNode
+  renderSlot?: (slotData: CameraStreamReceiverSlotData) => ReactNode;
+  children?: ReactNode;
 }
 
-export default function CameraStreamReceiver({
-  renderSlot,
-  children,
-}: CameraStreamReceiverProps) {
-  const [error, setError] = useState<Error | null>(null)
-  const [stream, setStream] = useState<MediaStream | null>(null)
-  const [videoStreamConstraints, setVideoStreamConstraints] = useState<VideoStreamConstrain>(
-    undefined
-  )
+export default function CameraStreamReceiver({ renderSlot, children }: CameraStreamReceiverProps) {
+  const [error, setError] = useState<Error | null>(null);
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [videoStreamConstraints, setVideoStreamConstraints] =
+    useState<VideoStreamConstrain>(undefined);
 
   useEffect(() => {
-    getCamera(videoStreamConstraints)
-  }, [videoStreamConstraints])
+    getCamera(videoStreamConstraints);
+  }, [videoStreamConstraints]);
 
   const getCamera = async (
-    videoStreamConstraints: MediaStreamConstraints['video']
+    videoStreamConstraints: MediaStreamConstraints['video'],
   ): Promise<void> => {
-    setError(null)
+    setError(null);
 
     if (stream) {
-      stream.getTracks().forEach((track) => track.stop())
+      stream.getTracks().forEach((track) => track.stop());
     }
 
     try {
       const newStream = await navigator.mediaDevices.getUserMedia({
         video: videoStreamConstraints,
-      })
-      setStream(newStream)
+      });
+      setStream(newStream);
     } catch (err) {
-      setError(err instanceof Error ? err : null)
-      setStream(null)
+      setError(err instanceof Error ? err : null);
+      setStream(null);
     }
-  }
+  };
 
   const slotData: CameraStreamReceiverSlotData =
     error !== null
@@ -51,7 +47,7 @@ export default function CameraStreamReceiver({
       : {
           error: null,
           stream,
-        }
+        };
 
   return (
     <div>
@@ -61,5 +57,5 @@ export default function CameraStreamReceiver({
       />
       {renderSlot ? renderSlot(slotData) : children}
     </div>
-  )
+  );
 }

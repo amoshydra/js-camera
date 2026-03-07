@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react'
-import { css } from '../../../styled-system/css'
-import { configStore } from './CameraStreamConfigurator.lib'
-import CameraStreamConfiguratorMenu from './CameraStreamConfiguratorMenu'
-import { VideoStreamConstrain } from './ConfigurationStorage'
+import { useState, useEffect } from 'react';
+import { css } from '../../../styled-system/css';
+import { configStore } from './CameraStreamConfigurator.lib';
+import CameraStreamConfiguratorMenu from './CameraStreamConfiguratorMenu';
+import { VideoStreamConstrain } from './ConfigurationStorage';
 
 interface CameraStreamConfiguratorProps {
-  value?: VideoStreamConstrain
-  onUpdateModelValue?: (value: VideoStreamConstrain) => void
+  value?: VideoStreamConstrain;
+  onUpdateModelValue?: (value: VideoStreamConstrain) => void;
 }
 
 const cssWrapper = css({
@@ -14,7 +14,7 @@ const cssWrapper = css({
   right: '0',
   top: '0',
   zIndex: '1',
-})
+});
 
 const cssButton = css({
   padding: '0.5rem',
@@ -22,7 +22,7 @@ const cssButton = css({
   backgroundColor: 'rgba(0, 0, 0, 0)',
   border: 'none',
   margin: '0.4em',
-})
+});
 
 const cssConfigurator = css({
   position: 'absolute',
@@ -31,38 +31,38 @@ const cssConfigurator = css({
   margin: '0.4em',
   width: 'calc(100vw - 0px - 0.8em)',
   boxSizing: 'border-box',
-})
+});
 
 export default function CameraStreamConfigurator({
   value,
   onUpdateModelValue,
 }: CameraStreamConfiguratorProps) {
-  const [showConfiguratorUi, setShowConfiguratorUi] = useState(false)
+  const [showConfiguratorUi, setShowConfiguratorUi] = useState(false);
 
   useEffect(() => {
-    emitConfig()
-  }, [])
+    emitConfig();
+  }, []);
 
   useEffect(() => {
-    window.addEventListener('click', handleBackgroundClick)
+    window.addEventListener('click', handleBackgroundClick);
     return () => {
-      window.removeEventListener('click', handleBackgroundClick)
-    }
-  }, [showConfiguratorUi])
+      window.removeEventListener('click', handleBackgroundClick);
+    };
+  }, [showConfiguratorUi]);
 
   const updateConfig = (config: VideoStreamConstrain) => {
-    configStore.store(config)
-    emitConfig()
-  }
+    configStore.store(config);
+    emitConfig();
+  };
 
   const emitConfig = () => {
-    onUpdateModelValue?.(configStore.load())
-  }
+    onUpdateModelValue?.(configStore.load());
+  };
 
   const handleBackgroundClick = (event: MouseEvent): void => {
-    if (!showConfiguratorUi) return
-    setShowConfiguratorUi(false)
-  }
+    if (!showConfiguratorUi) return;
+    setShowConfiguratorUi(false);
+  };
 
   return (
     <div className={cssWrapper}>
@@ -82,5 +82,5 @@ export default function CameraStreamConfigurator({
         />
       )}
     </div>
-  )
+  );
 }
