@@ -7,7 +7,6 @@ interface CameraVideoProps {
   className?: string;
 }
 
-
 export default function CameraVideo({ stream, onReady, className }: CameraVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -39,7 +38,7 @@ export default function CameraVideo({ stream, onReady, className }: CameraVideoP
 
 const cssVideo = css({
   width: '100%',
-  aspectRatio: "1 / 1",
+  aspectRatio: '1 / 1',
   background: 'slate.800',
   objectFit: 'contain',
 });

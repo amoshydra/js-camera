@@ -42,5 +42,5 @@ export default function CameraFeed({ onReady }: CameraFeedProps) {
 const cssWrapper = css({
   width: '100%',
   background: 'slate.800',
-  position: "relative",
+  position: 'relative',
 });

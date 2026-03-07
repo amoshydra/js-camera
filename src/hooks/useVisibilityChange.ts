@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 export const useDocumentVisibilityChange = () => {
   const [visible, setVisible] = useState(false);
@@ -19,4 +19,4 @@ export const useDocumentVisibilityChange = () => {
   }, []);
 
   return visible;
-}
+};

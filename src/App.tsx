@@ -4,7 +4,5 @@ import QrScanner from './pages/QrScanner';
 export default function App() {
   const documentVisible = useDocumentVisibilityChange();
 
-  return (
-    <QrScanner disabled={documentVisible} />
-  );
+  return <QrScanner disabled={documentVisible} />;
 }

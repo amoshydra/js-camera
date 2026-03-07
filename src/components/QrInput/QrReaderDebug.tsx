@@ -11,7 +11,6 @@ interface QrReaderDebugProps {
   lastError: string | null;
 }
 
-
 export default function QrReaderDebug({
   videoElement,
   isVideoReady,

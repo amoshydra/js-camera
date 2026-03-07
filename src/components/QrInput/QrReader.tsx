@@ -11,7 +11,6 @@ interface QrReaderProps {
   onChange?: (data: string | null) => void;
 }
 
-
 export default function QrReader({
   debug = false,
   videoElement,
@@ -34,12 +33,14 @@ export default function QrReader({
       const canvasEl = canvasRef.current;
       if (!canvasEl) return;
 
-      const ctx = canvasEl.getContext('2d');
+      const ctx = canvasEl.getContext('2d', {
+        willReadFrequently: true,
+        alpha: false,
+      });
       if (!ctx) return;
 
       ctx.canvas.width = video.videoWidth;
       ctx.canvas.height = video.videoHeight;
-      ctx.clearRect(0, 0, video.videoWidth, video.videoHeight);
 
       doScan(ctx, video);
     };
@@ -93,7 +94,6 @@ export default function QrReader({
       }
     };
 
-
     if (!videoElement) {
       setIsVideoReady(false);
     } else {
@@ -105,11 +105,7 @@ export default function QrReader({
         videoElement.addEventListener('loadedmetadata', initVideo, { once: true });
       }
 
-      videoElement.addEventListener(
-        'playing',
-        initVideo,
-        { once: true },
-      );
+      videoElement.addEventListener('playing', initVideo, { once: true });
     }
     return () => {
       videoElement?.removeEventListener('loadedmetadata', initVideo);
@@ -118,7 +114,10 @@ export default function QrReader({
   }, [videoElement, scanInterval, disabled, canScan, onChange]);
 
   return (
-    <div data-debug={showDebug} className={cssCanvasWrapper}>
+    <div
+      data-debug={showDebug}
+      className={cssCanvasWrapper}
+    >
       {showDebug && (
         <QrReaderDebug
           videoElement={videoElement}
@@ -145,7 +144,7 @@ const cssCanvas = css({
 });
 
 const cssCanvasWrapper = css({
-  display: "none",
+  display: 'none',
   '&[data-debug="true"]': {
     display: 'flex',
   },
