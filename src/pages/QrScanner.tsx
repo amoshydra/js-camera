@@ -1,5 +1,6 @@
 import { type QRCode } from 'jsqr';
 import { useState } from 'react';
+import { css } from '~styled-system/css';
 import ContentRenderer from '../components/ContentRenderer';
 import QrInput from '../components/QrInput/QrInput';
 
@@ -11,7 +12,7 @@ export default function QrScanner({ disabled = false }: QrScannerProps) {
   const [data, setData] = useState<QRCode | null>(null);
 
   return (
-    <div>
+    <div className={cssWrapper}>
       <QrInput
         disabled={disabled}
         onChange={setData}
@@ -20,3 +21,7 @@ export default function QrScanner({ disabled = false }: QrScannerProps) {
     </div>
   );
 }
+
+const cssWrapper = css({
+  paddingTop: 'env(safe-area-inset-top)',
+});

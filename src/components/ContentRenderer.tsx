@@ -6,22 +6,6 @@ interface ContentRendererProps {
   data: QRCode | null;
 }
 
-const cssContent = css({ padding: '1em' });
-
-const cssContentText = css({
-  boxShadow: '4px 4px 32px 0 rgba(0,0,0,0.25)',
-  padding: '1em',
-  marginBottom: '2em',
-});
-
-const cssContentAnchor = css({
-  display: 'inline-block',
-  fontSize: '1.25em',
-  wordBreak: 'break-word',
-  lineHeight: '1.25',
-  textDecoration: 'none',
-});
-
 function isUrl(data: string): boolean {
   try {
     new URL(data);
@@ -62,3 +46,21 @@ export default function ContentRenderer({ data: _data }: ContentRendererProps) {
     </div>
   );
 }
+
+const cssContent = css({ padding: '1em' });
+
+const cssContentText = css({
+  marginBottom: '2em',
+});
+
+const cssContentAnchor = css({
+  display: 'inline-block',
+  fontSize: '1.25em',
+  wordBreak: 'break-word',
+  lineHeight: '1.25',
+  textDecoration: 'none',
+  color: 'blue.800',
+  _active: {
+    color: 'blue.700',
+  },
+});
