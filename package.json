@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && panda codegen && panda cssgen && vite build",
+    "build": "panda codegen && panda cssgen && tsc && vite build",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
     "codegen": "panda codegen",
