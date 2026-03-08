@@ -1,4 +1,4 @@
-import { css } from '~styled-system/css';
+import { css, cx } from '~styled-system/css';
 import CameraFeedErrorPresenter from './CameraFeedErrorPresenter';
 import CameraStreamConfigurator from './CameraStreamConfigurator';
 import { useCameraStreamReceiver } from './CameraStreamReceiver.hook';
@@ -18,11 +18,16 @@ export default function CameraFeed({ onReady }: CameraFeedProps) {
 
   const resolvedError = mediaDevicesSupportError || error || null;
   if (resolvedError) {
-    <CameraFeedErrorPresenter error={resolvedError} />;
+    return (
+      <CameraFeedErrorPresenter
+        error={resolvedError}
+        className={cx(cssWrapper, cssViewfinderLiked)}
+      />
+    );
   }
 
   if (loading) {
-    return <div>Requesting camera access...</div>;
+    return <div className={cx(cssWrapper, cssViewfinderLiked)}>Requesting camera access...</div>;
   }
 
   return (
@@ -41,8 +46,18 @@ export default function CameraFeed({ onReady }: CameraFeedProps) {
 
 const cssWrapper = css({
   width: '100%',
-  background: 'slate.800',
+  background: 'stone.900',
   position: 'relative',
   borderRadius: 'xl',
   overflow: 'hidden',
+});
+
+const cssViewfinderLiked = css({
+  aspectRatio: '1 / 1',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: 2,
+  textAlign: 'center',
 });

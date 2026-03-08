@@ -39,6 +39,6 @@ export default function CameraVideo({ stream, onReady, className }: CameraVideoP
 const cssVideo = css({
   width: '100%',
   aspectRatio: '1 / 1',
-  background: 'slate.800',
+  background: 'zinc.900',
   objectFit: 'contain',
 });
