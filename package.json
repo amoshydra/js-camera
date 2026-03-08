@@ -10,6 +10,9 @@
     "fmt:check": "oxfmt --check",
     "codegen": "panda codegen",
     "cssgen": "panda cssgen",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:ui": "vitest --ui",
     "preview": "vite preview",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix"
@@ -20,15 +23,26 @@
   },
   "devDependencies": {
     "@pandacss/dev": "^1.8.2",
+    "@playwright/test": "^1.58.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/node": "^24.12.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.4",
+    "@vitest/browser": "4.0.18",
+    "@vitest/browser-playwright": "4.0.18",
+    "jsdom": "^28.1.0",
     "oxfmt": "^0.36.0",
     "oxlint": "^1.51.0",
+    "playwright": "^1.58.2",
     "postcss": "^8.5.8",
     "typescript": "~5.9.3",
     "vite": "8.0.0-beta.16",
-    "vite-plugin-pwa": "^1.2.0"
+    "vite-plugin-pwa": "^1.2.0",
+    "vitest": "4.0.18"
+  },
+  "volta": {
+    "node": "24.0.0"
   }
 }
