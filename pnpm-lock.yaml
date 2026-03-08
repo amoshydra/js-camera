@@ -8,9 +8,9 @@ importers:
 
   .:
     dependencies:
-      jsqr:
-        specifier: ^1.4.0
-        version: 1.4.0
+      '@undecaf/zbar-wasm':
+        specifier: ^0.11.0
+        version: 0.11.0
       react:
         specifier: ^19.2.4
         version: 19.2.4
@@ -1681,6 +1681,9 @@ packages:
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
 
+  '@undecaf/zbar-wasm@0.11.0':
+    resolution: {integrity: sha512-z2UZ+Uc50+qyE+HbU+Obdk/E5ecB7xYiu0i99bHQ9VlZVH0JMmE/5mJQa16Cutvwt80C9OZl8jEVayf5s5Azow==}
+
   '@vitejs/plugin-react@5.1.4':
     resolution: {integrity: sha512-VIcFLdRi/VYRU8OL/puL7QXMYafHmqOnwTZY50U1JPlCNj30PxCMx65c494b1K9be9hX83KVt0+gTEwTWLqToA==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -2555,9 +2558,6 @@ packages:
   jsonpointer@5.0.1:
     resolution: {integrity: sha512-p/nXbhSEcu3pZRdkW1OfJhpsVtW1gd4Wa1fnQc9YLiTfAjn0312eMKimbdIQzuZl9aa9xUGaRlP9T/CJE/ditQ==}
     engines: {node: '>=0.10.0'}
-
-  jsqr@1.4.0:
-    resolution: {integrity: sha512-dxLob7q65Xg2DvstYkRpkYtmKm2sPJ9oFhrhmudT1dZvNFFTlroai3AWSpLey/w5vMcLBXRgOJsbXpdN9HzU/A==}
 
   kleur@4.1.5:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
@@ -5391,6 +5391,8 @@ snapshots:
 
   '@types/trusted-types@2.0.7': {}
 
+  '@undecaf/zbar-wasm@0.11.0': {}
+
   '@vitejs/plugin-react@5.1.4(vite@8.0.0-beta.16(@types/node@24.12.0)(esbuild@0.27.3)(terser@5.46.0))':
     dependencies:
       '@babel/core': 7.29.0
@@ -6442,8 +6444,6 @@ snapshots:
       graceful-fs: 4.2.11
 
   jsonpointer@5.0.1: {}
-
-  jsqr@1.4.0: {}
 
   kleur@4.1.5: {}
 

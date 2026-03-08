@@ -28,7 +28,7 @@ export default function QrReaderDebug({
       <div>
         Dim: {videoWidth}x{videoHeight}
       </div>
-      <div>Scanner: {scannerType === 'native' ? 'BarcodeDetector' : 'jsQR (legacy)'}</div>
+      <div>Scanner: {scannerType === 'native' ? 'BarcodeDetector' : 'zbar.wasm'}</div>
       <div>Scanning: {isScanning ? 'true' : 'false'}</div>
       <div>Scans: {scanCount}</div>
       {lastError && <div>Error: {lastError}</div>}

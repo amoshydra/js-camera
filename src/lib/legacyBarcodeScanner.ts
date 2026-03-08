@@ -1,12 +1,12 @@
+import { scanImageData, ZBarSymbolType } from '@undecaf/zbar-wasm';
 import type { DetectedBarcode } from './barcodeScanner';
 
-let jsqrModule: typeof import('jsqr') | null = null;
+let zbarReady = false;
 
-async function loadJsQR() {
-  if (!jsqrModule) {
-    jsqrModule = await import('jsqr');
-  }
-  return jsqrModule;
+async function initZbar() {
+  if (zbarReady) return;
+  await scanImageData(new ImageData(1, 1));
+  zbarReady = true;
 }
 
 function isVideoReady(video: HTMLVideoElement): boolean {
@@ -24,12 +24,14 @@ export async function detectQRCodes(video: HTMLVideoElement): Promise<DetectedBa
     return [];
   }
 
-  const jsqr = await loadJsQR();
+  await initZbar();
 
   const canvas = document.createElement('canvas');
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  const ctx = canvas.getContext('2d');
+  const scale = Math.min(1, 600 / Math.max(video.videoWidth, video.videoHeight));
+  canvas.width = video.videoWidth * scale;
+  canvas.height = video.videoHeight * scale;
+
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
   if (!ctx) {
     return [];
   }
@@ -37,30 +39,18 @@ export async function detectQRCodes(video: HTMLVideoElement): Promise<DetectedBa
   ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-  const result = jsqr.default(imageData.data, imageData.width, imageData.height, {
-    inversionAttempts: 'dontInvert',
-  });
+  const results = await scanImageData(imageData);
 
-  if (!result) {
+  if (!results || results.length === 0) {
     return [];
   }
 
-  return [
-    {
-      rawValue: result.data,
+  return results
+    .filter((result) => result.type === ZBarSymbolType.ZBAR_QRCODE)
+    .map((result) => ({
+      rawValue: result.decode(),
       format: 'qr_code',
-      boundingBox: new DOMRectReadOnly(
-        result.location.topLeftCorner.x,
-        result.location.topLeftCorner.y,
-        result.location.bottomRightCorner.x - result.location.topLeftCorner.x,
-        result.location.bottomRightCorner.y - result.location.topLeftCorner.y,
-      ),
-      cornerPoints: [
-        result.location.topLeftCorner,
-        result.location.topRightCorner,
-        result.location.bottomRightCorner,
-        result.location.bottomLeftCorner,
-      ],
-    },
-  ];
+      boundingBox: new DOMRectReadOnly(0, 0, canvas.width, canvas.height),
+      cornerPoints: result.points.map((p) => ({ x: p.x, y: p.y })),
+    }));
 }

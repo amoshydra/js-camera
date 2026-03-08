@@ -12,7 +12,7 @@ export default function ScannedIndicator({ data, scannerType = 'native' }: Conte
   return (
     <div
       className={cssIndicator}
-      key={data ? data.boundingBox.x : 'idle'}
+      key={data ? data.cornerPoints[0]?.x : 'idle'}
       style={{ '--pulse-color': pulseColor } as React.CSSProperties}
     />
   );
