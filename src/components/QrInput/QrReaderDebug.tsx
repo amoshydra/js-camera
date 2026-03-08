@@ -8,6 +8,7 @@ interface QrReaderDebugProps {
   videoHeight: number;
   scanCount: number;
   lastError: string | null;
+  scannerType: 'native' | 'legacy';
 }
 
 export default function QrReaderDebug({
@@ -18,6 +19,7 @@ export default function QrReaderDebug({
   videoHeight,
   scanCount,
   lastError,
+  scannerType,
 }: QrReaderDebugProps) {
   return (
     <div className={cssDebugStatus}>
@@ -26,6 +28,7 @@ export default function QrReaderDebug({
       <div>
         Dim: {videoWidth}x{videoHeight}
       </div>
+      <div>Scanner: {scannerType === 'native' ? 'BarcodeDetector' : 'jsQR (legacy)'}</div>
       <div>Scanning: {isScanning ? 'true' : 'false'}</div>
       <div>Scans: {scanCount}</div>
       {lastError && <div>Error: {lastError}</div>}

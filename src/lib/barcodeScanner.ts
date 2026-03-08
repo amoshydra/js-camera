@@ -10,6 +10,7 @@ export interface DetectedBarcode {
 export interface QrReaderData {
   data: DetectedBarcode | null;
   error: AppError | null;
+  scannerType: 'native' | 'legacy';
 }
 
 declare global {

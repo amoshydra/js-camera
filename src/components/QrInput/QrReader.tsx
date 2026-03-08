@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { css } from '~styled-system/css';
-import { AppError, ErrorCode } from '../../lib/errors';
 import {
-  detectQRCodes,
+  detectQRCodes as nativeDetectQRCodes,
   isBarcodeDetectorSupported,
   type QrReaderData,
+  type DetectedBarcode,
 } from '../../lib/barcodeScanner';
+import { detectQRCodes as legacyDetectQRCodes } from '../../lib/legacyBarcodeScanner';
 import QrReaderDebug from './QrReaderDebug';
 
 const SCAN_FPS = 2;
@@ -28,12 +29,13 @@ export default function QrReader({
   const [isScanning, setIsScanning] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
   const [scanCount, setScanCount] = useState(0);
-  const [isSupported, setIsSupported] = useState<boolean | null>(null);
+  const [scannerType, setScannerType] = useState<'native' | 'legacy'>('native');
 
   const animationFrameRef = useRef<number | null>(null);
   const lastFrameTimeRef = useRef<number>(0);
   const lastResultRef = useRef<string>('');
   const onChangeRef = useRef(onChange);
+  const hasTriedLegacyRef = useRef(false);
 
   useEffect(() => {
     onChangeRef.current = onChange;
@@ -44,18 +46,20 @@ export default function QrReader({
 
   useEffect(() => {
     const supported = isBarcodeDetectorSupported();
-    setIsSupported(supported);
     if (!supported) {
-      onChangeRef.current?.({
-        data: null,
-        error: new AppError(
-          'BarcodeDetector is not supported in this browser',
-          ErrorCode.BARCODE_DETECTOR_NOT_SUPPORTED,
-          'Please use Chrome 83+ or Edge 83+ on desktop, or Android (Chrome) to scan QR codes',
-        ),
-      });
+      setScannerType('legacy');
     }
   }, []);
+
+  const detectQRCodes = useCallback(
+    async (video: HTMLVideoElement): Promise<DetectedBarcode[]> => {
+      if (scannerType === 'legacy') {
+        return legacyDetectQRCodes(video);
+      }
+      return nativeDetectQRCodes(video);
+    },
+    [scannerType],
+  );
 
   const scan = useCallback(
     async (timestamp: number) => {
@@ -85,41 +89,28 @@ export default function QrReader({
           const barcode = barcodes[0];
           if (barcode.rawValue !== lastResultRef.current) {
             lastResultRef.current = barcode.rawValue;
-            onChange?.({ data: barcode, error: null });
+            onChange?.({ data: barcode, error: null, scannerType });
             setLastError(null);
             setTimeout(() => {
               lastResultRef.current = '';
             }, 2000);
           }
         } else {
-          onChange?.({ data: null, error: null });
+          onChange?.({ data: null, error: null, scannerType });
         }
       } catch (e) {
         setLastError(String(e));
-        const errorMessage = String(e);
-        const isNotSupported = errorMessage.toLowerCase().includes('not supported');
-        const isServiceUnavailable = errorMessage.toLowerCase().includes('service unavailable');
 
-        const appError =
-          e instanceof AppError
-            ? e
-            : new AppError(
-                errorMessage,
-                isNotSupported
-                  ? ErrorCode.BARCODE_DETECTOR_NOT_SUPPORTED
-                  : ErrorCode.BARCODE_DETECTION_FAILED,
-                isNotSupported
-                  ? 'Please use Chrome 83+ or Edge 83+ on desktop, or Android (Chrome) to scan QR codes'
-                  : isServiceUnavailable
-                    ? 'Try reloading the page or check your camera permissions'
-                    : 'An error occurred while scanning',
-              );
-        onChangeRef.current?.({ data: null, error: appError });
+        if (scannerType === 'native' && !hasTriedLegacyRef.current) {
+          hasTriedLegacyRef.current = true;
+          setScannerType('legacy');
+          onChange?.({ data: null, error: null, scannerType: 'legacy' });
+        }
       }
 
       animationFrameRef.current = requestAnimationFrame(scan);
     },
-    [videoElement, canScan, disabled, onChange],
+    [videoElement, canScan, disabled, onChange, detectQRCodes, scannerType],
   );
 
   useEffect(() => {
@@ -148,10 +139,10 @@ export default function QrReader({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [videoElement, isSupported]);
+  }, [videoElement]);
 
   useEffect(() => {
-    if (canScan && isSupported !== false) {
+    if (canScan) {
       animationFrameRef.current = requestAnimationFrame(scan);
     }
 
@@ -160,7 +151,7 @@ export default function QrReader({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [canScan, isSupported, scan]);
+  }, [canScan, scan]);
 
   return (
     <div
@@ -176,6 +167,7 @@ export default function QrReader({
           videoHeight={videoElement?.videoHeight ?? 0}
           scanCount={scanCount}
           lastError={lastError}
+          scannerType={scannerType}
         />
       )}
     </div>

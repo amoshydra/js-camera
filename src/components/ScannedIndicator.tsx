@@ -3,13 +3,17 @@ import { css } from '~styled-system/css';
 
 interface ContentRendererProps {
   data: DetectedBarcode | null;
+  scannerType?: 'native' | 'legacy';
 }
 
-export default function ScannedIndicator({ data }: ContentRendererProps) {
+export default function ScannedIndicator({ data, scannerType = 'native' }: ContentRendererProps) {
+  const pulseColor = scannerType === 'legacy' ? '147, 51, 234' : '255, 255, 255';
+
   return (
     <div
       className={cssIndicator}
       key={data ? data.boundingBox.x : 'idle'}
+      style={{ '--pulse-color': pulseColor } as React.CSSProperties}
     />
   );
 }
@@ -17,7 +21,7 @@ export default function ScannedIndicator({ data }: ContentRendererProps) {
 const cssIndicator = css({
   position: 'fixed',
   inset: 0,
-  boxShadow: 'inset 0px 0px 4rem 0 rgba(255, 255, 255, 0.125)',
+  boxShadow: 'inset 0px 0px 4rem 0 rgba(var(--pulse-color), 0.125)',
   width: 'full',
   height: 'full',
   pointerEvents: 'none',

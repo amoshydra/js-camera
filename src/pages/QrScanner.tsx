@@ -10,11 +10,18 @@ interface QrScannerProps {
 }
 
 export default function QrScanner({ disabled = false }: QrScannerProps) {
-  const [data, setData] = useState<QrReaderData>({ data: null, error: null });
+  const [data, setData] = useState<QrReaderData>({
+    data: null,
+    error: null,
+    scannerType: 'native',
+  });
 
   return (
     <>
-      <ScannedIndicator data={data.data} />
+      <ScannedIndicator
+        data={data.data}
+        scannerType={data.scannerType}
+      />
       <div className={cssWrapper}>
         <QrInput
           disabled={disabled}
