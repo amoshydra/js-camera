@@ -96,11 +96,25 @@ export default function QrReader({
         }
       } catch (e) {
         setLastError(String(e));
+        const errorMessage = String(e);
+        const isNotSupported = errorMessage.toLowerCase().includes('not supported');
+        const isServiceUnavailable = errorMessage.toLowerCase().includes('service unavailable');
+
         const appError =
           e instanceof AppError
             ? e
-            : new AppError(String(e), ErrorCode.BARCODE_DETECTOR_NOT_SUPPORTED);
-        onChange?.({ data: null, error: appError });
+            : new AppError(
+                errorMessage,
+                isNotSupported
+                  ? ErrorCode.BARCODE_DETECTOR_NOT_SUPPORTED
+                  : ErrorCode.BARCODE_DETECTION_FAILED,
+                isNotSupported
+                  ? 'Please use Chrome 83+ or Edge 83+ on desktop, or Android (Chrome) to scan QR codes'
+                  : isServiceUnavailable
+                    ? 'Try reloading the page or check your camera permissions'
+                    : 'An error occurred while scanning',
+              );
+        onChangeRef.current?.({ data: null, error: appError });
       }
 
       animationFrameRef.current = requestAnimationFrame(scan);

@@ -7,7 +7,9 @@ interface ErrorDisplayProps {
 }
 
 export default function ErrorDisplay({ error, className }: ErrorDisplayProps) {
-  const showReloadButton = error.code === ErrorCode.BARCODE_DETECTOR_NOT_SUPPORTED;
+  const showReloadButton =
+    error.code === ErrorCode.BARCODE_DETECTOR_NOT_SUPPORTED ||
+    error.code === ErrorCode.BARCODE_DETECTION_FAILED;
 
   return (
     <div className={cx(cssWrapper, className)}>
