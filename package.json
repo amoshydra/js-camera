@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "panda codegen && panda cssgen && tsc && vite build",
+    "build": "panda codegen && panda cssgen && tsc -p tsconfig.app.json && vite build",
     "fmt": "oxfmt --check",
     "fmt:fix": "oxfmt",
     "lint": "oxlint",

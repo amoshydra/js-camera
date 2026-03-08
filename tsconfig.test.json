@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.test.tsbuildinfo",
+    // We overwrite these for tests
+    "noEmit": true,
+    "types": ["node", "vitest/globals"]
+  },
+  "include": ["src"],
+  "exclude": []
+}
