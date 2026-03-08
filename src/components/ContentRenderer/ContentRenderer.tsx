@@ -23,7 +23,17 @@ export default function ContentRenderer({ data, className }: ContentRendererProp
   const value = useLastGoodValue(d);
   const isUrl = value ? checkIsUrl(value) : false;
 
-  if (!value) return;
+  if (!value) {
+    return (
+      <div className={cx(cssWrapper, css({}), className)}>
+        <ContentCard
+          className={cx(cssTop, css({ color: 'gray', fontStyle: 'italic' }))}
+          value={'Scan a QR Code...'}
+          isUrl={false}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className={cx(cssWrapper, className)}>
@@ -44,9 +54,11 @@ export default function ContentRenderer({ data, className }: ContentRendererProp
 const cssWrapper = css({
   display: 'flex',
   flexDirection: 'column',
-  marginTop: 2,
   gap: 2,
   minHeight: 0,
+  '@media(orientation: landscape)': {
+    gap: 4,
+  },
 });
 
 const cssTop = css({
@@ -54,9 +66,16 @@ const cssTop = css({
   flexShrink: 0,
   minHeight: 0,
   flexBasis: 0,
+  '@media(orientation: landscape)': {
+    flexBasis: 'auto',
+    order: 2,
+  },
 });
 const cssBottom = css({
   flexGrow: 0,
   flexShrink: 1,
   minHeight: 0,
+  '@media(orientation: landscape)': {
+    order: 1,
+  },
 });

@@ -35,15 +35,34 @@ const cssWrapper = css({
   marginBottom: 'env(safe-area-inset-bottom)',
   padding: 4,
   display: 'flex',
-  flexDirection: 'column',
   height: 'full',
   minHeight: 0,
+  flexDirection: 'column',
+  gap: 2,
+  '@media(orientation: landscape)': {
+    flexDirection: 'row',
+    maxWidth: '1200px',
+    marginX: 'auto',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
 });
 const cssTop = css({
   flexGrow: 0,
   flexShrink: 1,
+  '@media(orientation: landscape)': {
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: '50%',
+  },
 });
 const cssBottom = css({
   flexGrow: 1,
   flexShrink: 0,
+  '@media(orientation: landscape)': {
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: '50%',
+  },
 });

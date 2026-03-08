@@ -21,17 +21,26 @@ export default function ContentAction({ value, isUrl, className }: ContentAction
 
   return (
     <div className={cx(cssWrapper, className)}>
-      <Button onClick={handleCopy}>Copy</Button>
-      {canShare && <Button onClick={handleShare}>Share</Button>}
+      <div className={cssButtonGroup}>
+        <Button onClick={handleCopy}>File</Button>
+      </div>
+      <div className={cssButtonGroup}>
+        <Button onClick={handleCopy}>Copy</Button>
+        {canShare && <Button onClick={handleShare}>Share</Button>}
+      </div>
     </div>
   );
 }
 
 const cssWrapper = css({
-  padding: 2,
   display: 'flex',
-  justifyContent: 'flex-end',
+  justifyContent: 'space-between',
   alignItems: 'center',
+  gap: 4,
+});
+
+const cssButtonGroup = css({
+  display: 'flex',
   gap: 2,
 });
 
