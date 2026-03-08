@@ -1,11 +1,11 @@
-import { type QRCode } from 'jsqr';
+import { type DetectedBarcode } from '@/lib/barcodeScanner';
 import { css, cx } from '~styled-system/css';
 import ContentAction from './ContentAction';
 import ContentCard from './ContentCard';
 import { useLastGoodValue } from './useLastGoodValue';
 
 interface ContentRendererProps {
-  data: QRCode | null;
+  data: DetectedBarcode | null;
   className?: string;
 }
 
@@ -19,7 +19,7 @@ function checkIsUrl(data: string): boolean {
 }
 
 export default function ContentRenderer({ data, className }: ContentRendererProps) {
-  const d = data?.data;
+  const d = data?.rawValue;
   const value = useLastGoodValue(d);
   const isUrl = value ? checkIsUrl(value) : false;
 

@@ -1,4 +1,4 @@
-import { type QRCode } from 'jsqr';
+import { type DetectedBarcode } from '@/lib/barcodeScanner';
 import { useState } from 'react';
 import { cx } from '~styled-system/css';
 import CameraFeed from './CameraFeed';
@@ -6,7 +6,7 @@ import QrReader from './QrReader';
 
 interface QrInputProps {
   disabled?: boolean;
-  onChange?: (data: QRCode | null) => void;
+  onChange?: (data: DetectedBarcode | null) => void;
   className?: string;
 }
 

@@ -1,116 +1,135 @@
-import jsQR, { type QRCode } from 'jsqr';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { css } from '~styled-system/css';
 import QrReaderDebug from './QrReaderDebug';
+import {
+  detectQRCodes,
+  isBarcodeDetectorSupported,
+  type DetectedBarcode,
+} from '../../lib/barcodeScanner';
+
+const SCAN_FPS = 2;
+const FRAME_INTERVAL = 1000 / SCAN_FPS;
 
 interface QrReaderProps {
   debug?: boolean;
   videoElement: HTMLVideoElement | null;
-  scanInterval?: number;
   disabled?: boolean;
-  onChange?: (data: QRCode | null) => void;
+  onChange?: (data: DetectedBarcode | null) => void;
 }
 
 export default function QrReader({
   debug = false,
   videoElement,
-  scanInterval = 500,
   disabled = false,
   onChange,
 }: QrReaderProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
   const [scanCount, setScanCount] = useState(0);
+  const [isSupported, setIsSupported] = useState<boolean | null>(null);
+
+  const animationFrameRef = useRef<number | null>(null);
+  const lastFrameTimeRef = useRef<number>(0);
+  const lastResultRef = useRef<string>('');
 
   const showDebug = debug || new URLSearchParams(window.location.search).get('debug') === 'true';
   const canScan = !disabled && !!videoElement && isVideoReady;
 
   useEffect(() => {
-    const setupCanvas = (video: HTMLVideoElement) => {
-      const canvasEl = canvasRef.current;
-      if (!canvasEl) return;
+    setIsSupported(isBarcodeDetectorSupported());
+  }, []);
 
-      const ctx = canvasEl.getContext('2d', {
-        willReadFrequently: true,
-        alpha: false,
-      });
-      if (!ctx) return;
-
-      ctx.canvas.width = video.videoWidth;
-      ctx.canvas.height = video.videoHeight;
-
-      doScan(ctx, video);
-    };
-
-    const coordinateScanning = (ctx: CanvasRenderingContext2D, video: HTMLVideoElement) => {
-      if (!canScan) return;
-
-      if (video.videoWidth === 0 || video.videoHeight === 0) {
-        return;
-      }
-
-      setScanCount((c) => c + 1);
-
-      ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
-      const imageData = ctx.getImageData(0, 0, video.videoWidth, video.videoHeight);
-
-      try {
-        const code = jsQR(imageData.data, video.videoWidth, video.videoHeight);
-        if (code) {
-          onChange?.(code);
-          setLastError(null);
-        } else {
-          onChange?.(null);
-          setLastError('No QR found');
-        }
-      } catch (e) {
-        setLastError(String(e));
-      }
-    };
-
-    const doScan = (ctx: CanvasRenderingContext2D, video: HTMLVideoElement) => {
-      if (disabled) {
+  const scan = useCallback(
+    async (timestamp: number) => {
+      if (!videoElement || !canScan || disabled) {
         setIsScanning(false);
         return;
       }
 
-      setIsScanning(true);
-      coordinateScanning(ctx, video);
-
-      setTimeout(() => {
-        if (!disabled) {
-          doScan(ctx, video);
-        }
-      }, scanInterval);
-    };
-
-    const initVideo = () => {
-      setIsVideoReady(true);
-      if (videoElement.readyState >= 2) {
-        setupCanvas(videoElement);
+      if (timestamp - lastFrameTimeRef.current < FRAME_INTERVAL) {
+        animationFrameRef.current = requestAnimationFrame(scan);
+        return;
       }
-    };
+      lastFrameTimeRef.current = timestamp;
+
+      if (videoElement.videoWidth === 0 || videoElement.videoHeight === 0) {
+        animationFrameRef.current = requestAnimationFrame(scan);
+        return;
+      }
+
+      setIsScanning(true);
+
+      try {
+        const barcodes = await detectQRCodes(videoElement);
+        setScanCount((c) => c + 1);
+
+        if (barcodes.length > 0) {
+          const barcode = barcodes[0];
+          if (barcode.rawValue !== lastResultRef.current) {
+            lastResultRef.current = barcode.rawValue;
+            onChange?.(barcode);
+            setLastError(null);
+            setTimeout(() => {
+              lastResultRef.current = '';
+            }, 2000);
+          }
+        } else {
+          onChange?.(null);
+        }
+      } catch (e) {
+        setLastError(String(e));
+      }
+
+      animationFrameRef.current = requestAnimationFrame(scan);
+    },
+    [videoElement, canScan, disabled, onChange],
+  );
+
+  useEffect(() => {
+    if (isSupported === false) {
+      setLastError('BarcodeDetector is not supported in this browser');
+      return;
+    }
 
     if (!videoElement) {
       setIsVideoReady(false);
-    } else {
-      setupCanvas(videoElement);
-
-      if (videoElement.readyState >= 2) {
-        initVideo();
-      } else {
-        videoElement.addEventListener('loadedmetadata', initVideo, { once: true });
-      }
-
-      videoElement.addEventListener('playing', initVideo, { once: true });
+      setIsScanning(false);
+      return;
     }
-    return () => {
-      videoElement?.removeEventListener('loadedmetadata', initVideo);
-      videoElement?.removeEventListener('playing', initVideo);
+
+    const initVideo = () => {
+      setIsVideoReady(true);
     };
-  }, [videoElement, scanInterval, disabled, canScan, onChange]);
+
+    if (videoElement.readyState >= 2) {
+      initVideo();
+    } else {
+      videoElement.addEventListener('loadedmetadata', initVideo, { once: true });
+    }
+
+    videoElement.addEventListener('playing', initVideo, { once: true });
+
+    return () => {
+      videoElement.removeEventListener('loadedmetadata', initVideo);
+      videoElement.removeEventListener('playing', initVideo);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [videoElement, isSupported]);
+
+  useEffect(() => {
+    if (canScan && isSupported !== false) {
+      animationFrameRef.current = requestAnimationFrame(scan);
+    }
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [canScan, isSupported, scan]);
 
   return (
     <div
@@ -128,18 +147,9 @@ export default function QrReader({
           lastError={lastError}
         />
       )}
-      <canvas
-        ref={canvasRef}
-        className={cssCanvas}
-      />
     </div>
   );
 }
-
-const cssCanvas = css({
-  height: '[120px]',
-  background: 'green',
-});
 
 const cssCanvasWrapper = css({
   display: 'none',

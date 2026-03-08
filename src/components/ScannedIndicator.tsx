@@ -1,15 +1,15 @@
-import { type QRCode } from 'jsqr';
+import { type DetectedBarcode } from '@/lib/barcodeScanner';
 import { css } from '~styled-system/css';
 
 interface ContentRendererProps {
-  data: QRCode | null;
+  data: DetectedBarcode | null;
 }
 
 export default function ScannedIndicator({ data }: ContentRendererProps) {
   return (
     <div
       className={cssIndicator}
-      key={data ? data.location.topLeftCorner.x : 'idle'}
+      key={data ? data.boundingBox.x : 'idle'}
     />
   );
 }

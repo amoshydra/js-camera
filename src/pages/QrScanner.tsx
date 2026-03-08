@@ -1,5 +1,5 @@
 import ScannedIndicator from '@/components/ScannedIndicator';
-import { type QRCode } from 'jsqr';
+import { type DetectedBarcode } from '@/lib/barcodeScanner';
 import { useState } from 'react';
 import { css } from '~styled-system/css';
 import ContentRenderer from '../components/ContentRenderer/ContentRenderer';
@@ -10,7 +10,7 @@ interface QrScannerProps {
 }
 
 export default function QrScanner({ disabled = false }: QrScannerProps) {
-  const [data, setData] = useState<QRCode | null>(null);
+  const [data, setData] = useState<DetectedBarcode | null>(null);
 
   return (
     <>
