@@ -1,7 +1,8 @@
-import { type QrReaderData } from '@/lib/barcodeScanner';
-import { AppError } from '@/lib/errors';
+import { type DetectedBarcode, type QrReaderData } from '@/lib/barcodeScanner';
+import { decodeImageQRCode } from '@/lib/decodeImageQRCode';
+import { AppError, ErrorCode } from '@/lib/errors';
 import { BottomSheet } from 'pure-web-bottom-sheet/react';
-import { CSSProperties } from 'react';
+import { CSSProperties, useEffect, useRef, useState } from 'react';
 import { css, cx } from '~styled-system/css';
 import ContentAction from './ContentAction';
 import ContentCard from './ContentCard';
@@ -12,6 +13,7 @@ import { useLastGoodValue } from './useLastGoodValue';
 interface ContentRendererProps {
   data: QrReaderData | null;
   className?: string;
+  onFileUpload?: (barcode: DetectedBarcode) => void;
 }
 
 function checkIsUrl(data: string): boolean {
@@ -23,11 +25,37 @@ function checkIsUrl(data: string): boolean {
   }
 }
 
-export default function ContentRenderer({ data, className }: ContentRendererProps) {
+export default function ContentRenderer({ data, className, onFileUpload }: ContentRendererProps) {
   const error = data?.error;
   const d = data?.data?.rawValue;
-  const value = useLastGoodValue(d);
+  const scannedValue = useLastGoodValue(d);
+  const [uploadedValue, setUploadedValue] = useState<string | null>(null);
+  const value = uploadedValue ?? scannedValue;
   const isUrl = value ? checkIsUrl(value) : false;
+  const [uploadError, setUploadError] = useState<AppError | null>(null);
+
+  useEffect(() => {
+    if (scannedValue) {
+      setUploadedValue(null);
+    }
+  }, [scannedValue]);
+
+  const handleFileUpload = async (file: File) => {
+    setUploadError(null);
+    try {
+      const result = await decodeImageQRCode(file);
+      setUploadedValue(result.rawValue);
+      onFileUpload?.(result);
+    } catch (e) {
+      if (e instanceof AppError) {
+        setUploadError(e);
+      } else {
+        setUploadError(new AppError(String(e), ErrorCode.BARCODE_DETECTION_FAILED));
+      }
+    }
+  };
+
+  const displayError = error ?? uploadError;
 
   return (
     <div className={className}>
@@ -93,9 +121,10 @@ export default function ContentRenderer({ data, className }: ContentRendererProp
         </div>
 
         <ContentRendererContent
-          error={error}
+          error={displayError}
           isUrl={isUrl}
           value={value}
+          onFileUpload={handleFileUpload}
         />
 
         {value && (
@@ -103,6 +132,7 @@ export default function ContentRenderer({ data, className }: ContentRendererProp
             <ContentAction
               value={value}
               isUrl={isUrl}
+              onFileUpload={handleFileUpload}
             />
           </div>
         )}
@@ -115,8 +145,24 @@ interface ContentRendererContentProps {
   error: AppError | null;
   value: string;
   isUrl: boolean;
+  onFileUpload?: (file: File) => void;
 }
-function ContentRendererContent({ error, value, isUrl }: ContentRendererContentProps) {
+function ContentRendererContent({
+  error,
+  value,
+  isUrl,
+  onFileUpload,
+}: ContentRendererContentProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      onFileUpload?.(file);
+      e.target.value = '';
+    }
+  };
+
   if (error) {
     return <ErrorDisplay error={error} />;
   }
@@ -136,7 +182,14 @@ function ContentRendererContent({ error, value, isUrl }: ContentRendererContentP
         )}
       >
         <div>
-          <Button>Upload file</Button>
+          <Button onClick={() => inputRef.current?.click()}>Upload file</Button>
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className={css({ display: 'none' })}
+          />
         </div>
       </div>
     );

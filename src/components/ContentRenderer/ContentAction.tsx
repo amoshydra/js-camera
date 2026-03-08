@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { css, cx } from '~styled-system/css';
 import { Button } from './Style';
 
@@ -5,10 +6,18 @@ interface ContentActionProps {
   value: string;
   isUrl: boolean;
   className?: string;
+  onFileUpload?: (file: File) => void;
 }
 
-export default function ContentAction({ value, isUrl, className }: ContentActionProps) {
+export default function ContentAction({
+  value,
+  isUrl,
+  className,
+  onFileUpload,
+}: ContentActionProps) {
   const canShare = navigator.canShare;
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const handleCopy = () => {
     navigator.clipboard.writeText(value);
   };
@@ -19,10 +28,29 @@ export default function ContentAction({ value, isUrl, className }: ContentAction
     });
   };
 
+  const handleFileUpload = () => {
+    inputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      onFileUpload?.(file);
+      e.target.value = '';
+    }
+  };
+
   return (
     <div className={cx(cssWrapper, className)}>
       <div className={cssButtonGroup}>
-        <Button onClick={handleCopy}>File</Button>
+        <Button onClick={handleFileUpload}>Upload</Button>
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className={css({ display: 'none' })}
+        />
       </div>
       <div className={cssButtonGroup}>
         <Button onClick={handleCopy}>Copy</Button>

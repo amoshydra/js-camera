@@ -46,7 +46,7 @@ export function isBarcodeDetectorSupported(): boolean {
 
 let barcodeDetectorInstance: InstanceType<NonNullable<Window['BarcodeDetector']>> | null = null;
 
-async function getBarcodeDetector() {
+export async function getBarcodeDetector() {
   if (barcodeDetectorInstance) {
     return barcodeDetectorInstance;
   }
