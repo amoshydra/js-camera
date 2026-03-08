@@ -1,4 +1,6 @@
 import { defineConfig } from '@pandacss/dev';
+import { removeUnusedCssVars } from './builds/panda/remove-unused-css-vars';
+import { removeUnusedKeyframes } from './builds/panda/remove-unused-keyframes';
 
 export default defineConfig({
   preflight: true,
@@ -14,6 +16,14 @@ export default defineConfig({
           '100%': { opacity: 0 },
         },
       },
+    },
+  },
+  hooks: {
+    // https://panda-css.com/docs/concepts/hooks#remove-unused-variables-from-final-css
+    'cssgen:done': ({ artifact, content }) => {
+      if (artifact === 'styles.css') {
+        return removeUnusedCssVars(removeUnusedKeyframes(content));
+      }
     },
   },
 });
