@@ -26,22 +26,21 @@ export default function ContentCard({ value, isUrl = false, className }: Content
 }
 
 const cssContent = css({
+  borderRadius: 'lg',
+  width: 'full',
   paddingY: 4,
   paddingX: 4,
-  borderRadius: 'lg',
-  background: 'stone.950',
-  width: 'full',
-  overflow: 'auto',
-  overscrollBehavior: 'none',
+  background: 'rgba(16, 16, 16, 0.9)',
 });
-
 const cssContentText = css({
   wordBreak: 'break-word',
+  whiteSpace: 'pre-wrap',
+  fontSize: '1rem',
 });
 
 const cssContentAnchor = css({
   display: 'inline-block',
-  fontSize: '1.25em',
+  fontSize: '1rem',
   wordBreak: 'break-word',
   lineHeight: '1.25',
   textDecoration: 'none',

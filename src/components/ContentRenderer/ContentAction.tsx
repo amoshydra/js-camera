@@ -1,5 +1,5 @@
 import { css, cx } from '~styled-system/css';
-import { styled } from '~styled-system/jsx';
+import { Button } from './Style';
 
 interface ContentActionProps {
   value: string;
@@ -42,22 +42,4 @@ const cssWrapper = css({
 const cssButtonGroup = css({
   display: 'flex',
   gap: 2,
-});
-
-const Button = styled('button', {
-  base: {
-    display: 'block',
-    paddingY: 2,
-    paddingX: 8,
-    background: 'stone.900',
-    borderRadius: 'lg',
-    '@media(hover: hover)': {
-      _hover: {
-        background: 'stone.800',
-      },
-    },
-    _active: {
-      background: 'stone.800',
-    },
-  },
 });
