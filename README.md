@@ -1,31 +1,42 @@
-# js-camera
+<div align="center">
 
-A web-based QR code scanner.
+  <a href="https://amoshydra.github.io/js-camera/">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/c3ec2b02-4c4e-46ad-9cc1-7c45856796f5">
+      <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/476e80b4-2d0a-4bbf-927c-3f24b6ddaba0">
+      <img alt="JS CAMERA" src="https://github.com/user-attachments/assets/89986c31-d31a-4401-be7d-a882b9e32a62">      
+    </picture>
+  </a>
 
-## Demo
+Web QR Code scanner
 
-https://amoshydra.github.io/js-camera/
+[`amoshydra.github.io/js-camera`](https://amoshydra.github.io/js-camera)
 
-## Setup
+</div>
 
-```bash
-pnpm install
-```
+<br /><br /><br /><br />
+
+## Features
+
+- Client side QR Code scanning
+- Use Browser's Barcode Detector API for hardware accelerated scanning
+- Fallback to zbar.wasm (from [undecaf/zbar-wasm](https://github.com/undecaf/zbar-wasm))
+
+<br /><br /><br /><br />
 
 ## Development
 
 ```bash
-pnpm serve
+pnpm install
+pnpm dev
 ```
 
-## Build
+Lint and Format
 
 ```bash
-pnpm build
+pnpm lint:fix && pnpm fmt:fix
 ```
 
-## Lint
+<br /><br /><br /><br />
 
-```bash
-pnpm lint
-```
+<br /><br /><br /><br />
