@@ -6,15 +6,16 @@ import CameraVideo from './CameraVideo';
 
 interface CameraFeedProps {
   onReady?: (videoEl: HTMLVideoElement) => void;
+  paused?: boolean;
 }
 
-export default function CameraFeed({ onReady }: CameraFeedProps) {
+export default function CameraFeed({ onReady, paused = false }: CameraFeedProps) {
   const hasGetUserMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
   const mediaDevicesSupportError = hasGetUserMedia
     ? null
     : new Error('mediaDevices is not supported');
   const { stream, loading, error, onVideoStreamContrainsChange, videoStreamConstraints } =
-    useCameraStreamReceiver();
+    useCameraStreamReceiver(paused);
 
   const resolvedError = mediaDevicesSupportError || error || null;
   if (resolvedError) {

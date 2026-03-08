@@ -1,16 +1,30 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ConfigurationStorage, VideoStreamConstrain } from './ConfigurationStorage';
 
-export const useCameraStreamReceiver = () => {
+export const useCameraStreamReceiver = (paused = false) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [videoStreamConstraints, setVideoStreamConstraints] = useState<VideoStreamConstrain>(
     ConfigurationStorage.defaultConfig,
   );
+  const streamRef = useRef<MediaStream | null>(null);
+
+  const stopStream = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+      setStream(null);
+    }
+  };
 
   useEffect(() => {
-    let newStream: MediaStream | null = null;
+    if (paused) {
+      stopStream();
+      return;
+    }
+
+    let cancelled = false;
 
     const getCamera = async (
       videoStreamConstraints: MediaStreamConstraints['video'],
@@ -19,24 +33,30 @@ export const useCameraStreamReceiver = () => {
       setLoading(true);
 
       try {
-        newStream = await navigator.mediaDevices.getUserMedia({
+        const newStream = await navigator.mediaDevices.getUserMedia({
           video: videoStreamConstraints,
         });
-        setStream(newStream);
+        if (!cancelled) {
+          streamRef.current = newStream;
+          setStream(newStream);
+        }
       } catch (err) {
-        setError(err instanceof Error ? err : null);
-        setStream(null);
+        if (!cancelled) {
+          setError(err instanceof Error ? err : null);
+          setStream(null);
+        }
       }
-      setLoading(false);
+      if (!cancelled) {
+        setLoading(false);
+      }
     };
 
     getCamera(videoStreamConstraints);
     return () => {
-      if (newStream) {
-        newStream.getTracks().forEach((track) => track.stop());
-      }
+      cancelled = true;
+      stopStream();
     };
-  }, [videoStreamConstraints]);
+  }, [videoStreamConstraints, paused]);
 
   return {
     videoStreamConstraints,

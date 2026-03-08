@@ -16,6 +16,7 @@ interface QrReaderProps {
   debug?: boolean;
   videoElement: HTMLVideoElement | null;
   disabled?: boolean;
+  paused?: boolean;
   onChange?: (data: QrReaderData) => void;
 }
 
@@ -23,6 +24,7 @@ export default function QrReader({
   debug = false,
   videoElement,
   disabled = false,
+  paused = false,
   onChange,
 }: QrReaderProps) {
   const [isVideoReady, setIsVideoReady] = useState(false);
@@ -42,7 +44,7 @@ export default function QrReader({
   }, [onChange]);
 
   const showDebug = debug || new URLSearchParams(window.location.search).get('debug') === 'true';
-  const canScan = !disabled && !!videoElement && isVideoReady;
+  const canScan = !disabled && !paused && !!videoElement && isVideoReady;
 
   useEffect(() => {
     const supported = isBarcodeDetectorSupported();
