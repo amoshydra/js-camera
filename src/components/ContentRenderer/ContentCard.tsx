@@ -2,11 +2,11 @@ import { css, cx } from '~styled-system/css';
 
 interface ContentCardProps {
   value: string;
-  isUrl: boolean;
+  isUrl?: boolean;
   className?: string;
 }
 
-export default function ContentCard({ value, isUrl, className }: ContentCardProps) {
+export default function ContentCard({ value, isUrl = false, className }: ContentCardProps) {
   return (
     <div className={cx(cssContent, className)}>
       {isUrl ? (

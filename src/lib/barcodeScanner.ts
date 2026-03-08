@@ -1,8 +1,15 @@
+import { AppError, ErrorCode } from './errors';
+
 export interface DetectedBarcode {
   rawValue: string;
   format: string;
   boundingBox: DOMRectReadOnly;
   cornerPoints: { x: number; y: number }[];
+}
+
+export interface QrReaderData {
+  data: DetectedBarcode | null;
+  error: AppError | null;
 }
 
 declare global {
@@ -44,7 +51,11 @@ async function getBarcodeDetector() {
   }
 
   if (!isBarcodeDetectorSupported()) {
-    throw new Error('BarcodeDetector is not supported in this browser');
+    throw new AppError(
+      'BarcodeDetector is not supported in this browser',
+      ErrorCode.BARCODE_DETECTOR_NOT_SUPPORTED,
+      'Please use Chrome 83+ or Edge 83+ on desktop, or Android (Chrome) to scan QR codes',
+    );
   }
 
   barcodeDetectorInstance = new window.BarcodeDetector!({

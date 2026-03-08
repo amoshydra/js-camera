@@ -1,11 +1,12 @@
-import { type DetectedBarcode } from '@/lib/barcodeScanner';
+import { type QrReaderData } from '@/lib/barcodeScanner';
 import { css, cx } from '~styled-system/css';
 import ContentAction from './ContentAction';
 import ContentCard from './ContentCard';
+import ErrorDisplay from './ErrorDisplay';
 import { useLastGoodValue } from './useLastGoodValue';
 
 interface ContentRendererProps {
-  data: DetectedBarcode | null;
+  data: QrReaderData | null;
   className?: string;
 }
 
@@ -19,9 +20,19 @@ function checkIsUrl(data: string): boolean {
 }
 
 export default function ContentRenderer({ data, className }: ContentRendererProps) {
-  const d = data?.rawValue;
+  const error = data?.error;
+  const d = data?.data?.rawValue;
   const value = useLastGoodValue(d);
   const isUrl = value ? checkIsUrl(value) : false;
+
+  if (error) {
+    return (
+      <ErrorDisplay
+        className={className}
+        error={error}
+      />
+    );
+  }
 
   if (!value) {
     return (
@@ -29,7 +40,6 @@ export default function ContentRenderer({ data, className }: ContentRendererProp
         <ContentCard
           className={cx(cssTop, css({ color: 'gray', fontStyle: 'italic' }))}
           value={'Scan a QR Code...'}
-          isUrl={false}
         />
       </div>
     );
