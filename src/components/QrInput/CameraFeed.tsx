@@ -1,5 +1,6 @@
 import { css, cx } from '~styled-system/css';
 import CameraFeedErrorPresenter from './CameraFeedErrorPresenter';
+import CameraControls from './CameraControls';
 import CameraStreamConfigurator from './CameraStreamConfigurator';
 import { useCameraStreamReceiver } from './CameraStreamReceiver.hook';
 import CameraVideo from './CameraVideo';
@@ -14,8 +15,19 @@ export default function CameraFeed({ onReady, disabled }: CameraFeedProps) {
   const mediaDevicesSupportError = hasGetUserMedia
     ? null
     : new Error('mediaDevices is not supported');
-  const { stream, loading, error, onVideoStreamContrainsChange, videoStreamConstraints } =
-    useCameraStreamReceiver(disabled);
+  const {
+    stream,
+    loading,
+    error,
+    onVideoStreamContrainsChange,
+    videoStreamConstraints,
+    torchEnabled,
+    zoomLevel,
+    capabilities,
+    applyTorch,
+    applyZoom,
+    flipCamera,
+  } = useCameraStreamReceiver(disabled);
 
   const resolvedError = mediaDevicesSupportError || error || null;
   if (resolvedError) {
@@ -36,22 +48,35 @@ export default function CameraFeed({ onReady, disabled }: CameraFeedProps) {
   }
 
   return (
-    <div className={cssWrapper}>
-      <CameraStreamConfigurator
-        value={videoStreamConstraints}
-        onUpdateModelValue={onVideoStreamContrainsChange}
+    <>
+      <div className={cssWrapper}>
+        <CameraStreamConfigurator
+          value={videoStreamConstraints}
+          onUpdateModelValue={onVideoStreamContrainsChange}
+        />
+        <CameraVideo
+          className={cssViewFinder}
+          stream={stream}
+          onReady={onReady}
+        />
+      </div>
+      <CameraControls
+        torchEnabled={torchEnabled}
+        zoomLevel={zoomLevel}
+        capabilities={capabilities}
+        applyTorch={applyTorch}
+        applyZoom={applyZoom}
+        onFlip={flipCamera}
       />
-      <CameraVideo
-        className={cssViewFinder}
-        stream={stream}
-        onReady={onReady}
-      />
-    </div>
+    </>
   );
 }
 
 const cssWrapper = css({
   width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 2,
   background: 'stone.900',
   position: 'relative',
   borderRadius: 'xl',

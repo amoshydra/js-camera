@@ -59,9 +59,11 @@ const cssWrapper = css({
 const cssButton = css({
   padding: '0.5rem',
   fontSize: '1rem',
-  backgroundColor: 'rgba(0, 0, 0, 0)',
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
   border: 'none',
   margin: '0.4em',
+  borderRadius: 'md',
+  color: 'white',
 });
 
 const cssConfigurator = css({

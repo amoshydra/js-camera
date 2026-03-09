@@ -9,8 +9,6 @@ interface CameraStreamConfiguratorMenuProps {
   onClose?: () => void;
 }
 
-type InputName = 'videoSource' | 'orientation';
-
 const extractOrGetFirst = <T,>(itemOrArrayOfItems: T | T[]): T =>
   Array.isArray(itemOrArrayOfItems) ? itemOrArrayOfItems[0] : itemOrArrayOfItems;
 
@@ -48,25 +46,13 @@ export default function CameraStreamConfiguratorMenu({
   }, []);
 
   const selectedDeviceId = extractConfig(value as VideoStreamConstrain, 'deviceId');
-  const selectedFacingMode = extractConfig(value as VideoStreamConstrain, 'facingMode');
 
-  const handleInput = (
-    inputName: InputName,
-    event: ChangeEvent<HTMLSelectElement | HTMLInputElement>,
-  ) => {
-    if (inputName === 'videoSource') {
-      const selectEl = event.currentTarget;
-      onUpdateModelValue?.({
-        ...(value as object),
-        deviceId: selectEl.value,
-      } as VideoStreamConstrain);
-    } else if (inputName === 'orientation') {
-      const radioEl = event.currentTarget;
-      onUpdateModelValue?.({
-        ...(value as object),
-        facingMode: radioEl.value,
-      } as VideoStreamConstrain);
-    }
+  const handleInput = (event: ChangeEvent<HTMLSelectElement>) => {
+    const selectEl = event.currentTarget;
+    onUpdateModelValue?.({
+      ...(value as object),
+      deviceId: selectEl.value,
+    } as VideoStreamConstrain);
   };
 
   return (
@@ -83,7 +69,7 @@ export default function CameraStreamConfiguratorMenu({
           <h5>Video source</h5>
           <select
             className={cssInput}
-            onChange={(e) => handleInput('videoSource', e)}
+            onChange={handleInput}
           >
             <option
               key="default"
@@ -98,37 +84,11 @@ export default function CameraStreamConfiguratorMenu({
                 value={device.deviceId}
                 selected={selectedDeviceId === device.deviceId}
               >
-                {device.label}
+                {device.label || `Camera ${device.deviceId.slice(0, 8)}`}
               </option>
             ))}
           </select>
         </label>
-
-        <fieldset className={cssFieldGroup}>
-          <legend>Facing</legend>
-          <div className={css({ marginTop: 2 })}>
-            <label className={cssFieldRadio}>
-              <input
-                type="radio"
-                name="orientation"
-                checked={selectedFacingMode === 'user'}
-                value="user"
-                onChange={(e) => handleInput('orientation', e)}
-              />
-              Front
-            </label>
-            <label className={cssFieldRadio}>
-              <input
-                type="radio"
-                name="orientation"
-                checked={selectedFacingMode === 'environment'}
-                value="environment"
-                onChange={(e) => handleInput('orientation', e)}
-              />
-              Back
-            </label>
-          </div>
-        </fieldset>
       </form>
     </div>
   );
@@ -158,9 +118,4 @@ const cssInput = css({
 const cssFieldGroup = css({
   display: 'grid',
   rowGap: 2,
-});
-
-const cssFieldRadio = css({
-  display: 'flex',
-  gap: 1,
 });
