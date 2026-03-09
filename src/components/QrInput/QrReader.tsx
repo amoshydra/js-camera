@@ -7,6 +7,7 @@ import {
   type DetectedBarcode,
 } from '../../lib/barcodeScanner';
 import { detectQRCodes as legacyDetectQRCodes } from '../../lib/legacyBarcodeScanner';
+import { queryParams } from '../../lib/queryParams';
 import QrReaderDebug from './QrReaderDebug';
 
 const SCAN_FPS = 2;
@@ -43,10 +44,15 @@ export default function QrReader({
     onChangeRef.current = onChange;
   }, [onChange]);
 
-  const showDebug = debug || new URLSearchParams(window.location.search).get('debug') === 'true';
+  const showDebug = debug || queryParams.debug;
   const canScan = !disabled && !paused && !!videoElement && isVideoReady;
 
   useEffect(() => {
+    if (queryParams.scanner === 'legacy') {
+      setScannerType('legacy');
+      return;
+    }
+
     const supported = isBarcodeDetectorSupported();
     if (!supported) {
       setScannerType('legacy');
