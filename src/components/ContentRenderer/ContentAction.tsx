@@ -1,6 +1,7 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { css, cx } from '~styled-system/css';
 import { Button } from './Style';
+import { CopyIcon, CheckIcon, ShareIcon, UploadIcon } from './Icons';
 
 interface ContentActionProps {
   value: string;
@@ -17,10 +18,18 @@ export default function ContentAction({
 }: ContentActionProps) {
   const canShare = navigator.canShare;
   const inputRef = useRef<HTMLInputElement>(null);
+  const [copied, setCopied] = useState(false);
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(value);
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Silent fail - user will see nothing happened
+    }
   };
+
   const handleShare = () => {
     const key: keyof ShareData = isUrl ? 'url' : 'text';
     navigator.share({
@@ -43,19 +52,36 @@ export default function ContentAction({
   return (
     <div className={cx(cssWrapper, className)}>
       <div className={cssButtonGroup}>
-        <Button onClick={handleFileUpload}>Upload</Button>
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-          className={css({ display: 'none' })}
-        />
+        <Button onClick={handleFileUpload}>
+          <span className={cssIcon}>
+            <UploadIcon />
+          </span>
+          Upload
+        </Button>
       </div>
+
       <div className={cssButtonGroup}>
-        <Button onClick={handleCopy}>Copy</Button>
-        {canShare && <Button onClick={handleShare}>Share</Button>}
+        <Button onClick={handleCopy}>
+          <span className={cssIcon}>{copied ? <CheckIcon /> : <CopyIcon />}</span>
+          {copied ? 'Copied!' : 'Copy'}
+        </Button>
+        {canShare && (
+          <Button onClick={handleShare}>
+            <span className={cssIcon}>
+              <ShareIcon />
+            </span>
+            Share
+          </Button>
+        )}
       </div>
+
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        className={css({ display: 'none' })}
+      />
     </div>
   );
 }
@@ -63,11 +89,24 @@ export default function ContentAction({
 const cssWrapper = css({
   display: 'flex',
   justifyContent: 'space-between',
-  alignItems: 'center',
-  gap: 4,
+  gap: 2,
+  width: 'full',
 });
 
 const cssButtonGroup = css({
   display: 'flex',
   gap: 2,
+});
+
+const cssIcon = css({
+  width: 4,
+  height: 4,
+  flexShrink: 0,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  '& svg': {
+    width: 'full',
+    height: 'full',
+  },
 });

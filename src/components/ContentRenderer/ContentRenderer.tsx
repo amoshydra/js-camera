@@ -7,6 +7,7 @@ import { css, cx } from '~styled-system/css';
 import ContentAction from './ContentAction';
 import ContentCard from './ContentCard';
 import ErrorDisplay from './ErrorDisplay';
+import { QrCodeIcon, UploadIcon } from './Icons';
 import { Button, ContentHeading } from './Style';
 import { useLastGoodValue } from './useLastGoodValue';
 
@@ -85,6 +86,7 @@ export default function ContentRenderer({ data, className, onFileUpload }: Conte
             },
             '&::part(content)': {
               padding: 0,
+              paddingBottom: 'env(safe-area-inset-bottom)',
               boxSizing: 'border-box',
               background: 'rgba(22, 22, 22, 0.95)',
               backdropFilter: 'blur(8px)',
@@ -157,8 +159,17 @@ function ContentRendererContent({
 
   if (!value) {
     return (
-      <div className={cssWrapper}>
-        <Button onClick={() => inputRef.current?.click()}>Upload file</Button>
+      <div className={cssEmptyState}>
+        <div className={cssEmptyIcon}>
+          <QrCodeIcon />
+        </div>
+        <p className={cssEmptyText}>Scan or upload a QR code</p>
+        <Button onClick={() => inputRef.current?.click()}>
+          <span className={cssUploadIcon}>
+            <UploadIcon />
+          </span>
+          Upload image
+        </Button>
         <input
           ref={inputRef}
           type="file"
@@ -189,11 +200,51 @@ function ContentRendererContent({
 }
 
 const cssWrapper = css({
-  padding: 8,
-  paddingTop: 6,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   flexDir: 'column',
   gap: 6,
+  padding: 6,
+});
+
+const cssEmptyState = css({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 4,
+  padding: 8,
+});
+
+const cssEmptyIcon = css({
+  width: 20,
+  height: 20,
+  color: 'zinc.600',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  '& svg': {
+    width: 'full',
+    height: 'full',
+  },
+});
+
+const cssEmptyText = css({
+  fontSize: 'sm',
+  color: 'zinc.600',
+  margin: 0,
+  textAlign: 'center',
+});
+
+const cssUploadIcon = css({
+  width: 4,
+  height: 4,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  '& svg': {
+    width: 'full',
+    height: 'full',
+  },
 });
