@@ -4,8 +4,16 @@ import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 const base = process.env.BUILD_PUBLIC_PATH ?? '/';
+const gitSha = require('child_process')
+  .execSync('git rev-parse HEAD')
+  .toString()
+  .trim()
+  .substring(0, 9);
 
 export default defineConfig({
+  define: {
+    'import.meta.env.VITE_GIT_SHA': JSON.stringify(gitSha),
+  },
   plugins: [
     react(),
     VitePWA({

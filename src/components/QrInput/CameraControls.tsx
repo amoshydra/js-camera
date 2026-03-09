@@ -75,6 +75,7 @@ const cssWrapper = css({
   justifyContent: 'space-between',
   borderRadius: 'md',
   gap: 2,
+  height: 12,
 });
 
 const cssButton = css({

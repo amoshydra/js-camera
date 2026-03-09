@@ -1,6 +1,6 @@
 import { css, cx } from '~styled-system/css';
-import CameraFeedErrorPresenter from './CameraFeedErrorPresenter';
 import CameraControls from './CameraControls';
+import CameraFeedErrorPresenter from './CameraFeedErrorPresenter';
 import CameraStreamConfigurator from './CameraStreamConfigurator';
 import { useCameraStreamReceiver } from './CameraStreamReceiver.hook';
 import CameraVideo from './CameraVideo';
@@ -11,10 +11,6 @@ interface CameraFeedProps {
 }
 
 export default function CameraFeed({ onReady, disabled }: CameraFeedProps) {
-  const hasGetUserMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-  const mediaDevicesSupportError = hasGetUserMedia
-    ? null
-    : new Error('mediaDevices is not supported');
   const {
     stream,
     loading,
@@ -29,24 +25,6 @@ export default function CameraFeed({ onReady, disabled }: CameraFeedProps) {
     flipCamera,
   } = useCameraStreamReceiver(disabled);
 
-  const resolvedError = mediaDevicesSupportError || error || null;
-  if (resolvedError) {
-    return (
-      <CameraFeedErrorPresenter
-        error={resolvedError}
-        className={cx(cssWrapper, cssViewfinderLiked)}
-      />
-    );
-  }
-
-  if (loading) {
-    return <div className={cx(cssWrapper, cssViewfinderLiked)}>Requesting camera access...</div>;
-  }
-
-  if (!stream) {
-    return <div className={cx(cssWrapper, cssViewfinderLiked)}>Tap to activate</div>;
-  }
-
   return (
     <>
       <div className={cssWrapper}>
@@ -54,10 +32,11 @@ export default function CameraFeed({ onReady, disabled }: CameraFeedProps) {
           value={videoStreamConstraints}
           onUpdateModelValue={onVideoStreamContrainsChange}
         />
-        <CameraVideo
-          className={cssViewFinder}
-          stream={stream}
+        <_CameraFeed
           onReady={onReady}
+          loading={loading}
+          stream={stream}
+          error={error}
         />
       </div>
       <CameraControls
@@ -70,6 +49,46 @@ export default function CameraFeed({ onReady, disabled }: CameraFeedProps) {
         className={css({ marginTop: 2 })}
       />
     </>
+  );
+}
+
+interface _CameraFeedProps {
+  onReady: (videoEl: HTMLVideoElement) => void;
+  loading: boolean;
+  stream: MediaStream;
+  error: Error;
+}
+
+function _CameraFeed({ onReady, loading, stream, error }: _CameraFeedProps) {
+  const hasGetUserMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+  const mediaDevicesSupportError = hasGetUserMedia
+    ? null
+    : new Error('mediaDevices is not supported');
+
+  const resolvedError = mediaDevicesSupportError || error || null;
+  if (resolvedError) {
+    return (
+      <CameraFeedErrorPresenter
+        error={resolvedError}
+        className={cx(cssViewfinderLiked)}
+      />
+    );
+  }
+
+  if (loading) {
+    return <div className={cx(cssViewfinderLiked)}>Requesting camera access...</div>;
+  }
+
+  if (!stream) {
+    return <div className={cx(cssViewfinderLiked)}>Tap to activate</div>;
+  }
+
+  return (
+    <CameraVideo
+      className={cssViewFinder}
+      stream={stream}
+      onReady={onReady}
+    />
   );
 }
 

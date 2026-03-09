@@ -140,6 +140,18 @@ export default function CameraStreamConfiguratorMenu({
             </select>
           </label>
         </section>
+
+        <div className={cssFooter}>
+          <a
+            href="https://github.com/amoshydra/js-camera"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cssLink}
+          >
+            GitHub - amoshydra/js-camera
+          </a>
+          <span className={cssVersion}>{import.meta.env.VITE_GIT_SHA}</span>
+        </div>
       </div>
     </div>
   );
@@ -149,7 +161,6 @@ const cssWrapper = css({
   padding: '1em',
   paddingTop: '2em',
   paddingBottom: '2em',
-  minWidth: '280px',
 });
 
 const cssButton = css({
@@ -266,4 +277,27 @@ const cssToggleSlider = css({
     borderRadius: '50%',
     transition: '0.2s',
   },
+});
+
+const cssFooter = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+  gap: 2,
+  marginTop: 24,
+});
+
+const cssLink = css({
+  color: 'blue.600',
+  textDecoration: 'none',
+  fontSize: '0.75rem',
+  '&:hover': {
+    textDecoration: 'underline',
+  },
+});
+
+const cssVersion = css({
+  fontSize: '0.75rem',
+  color: 'rgba(255,255,255,0.5)',
+  fontFamily: 'mono',
 });
