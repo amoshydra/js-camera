@@ -10,7 +10,7 @@ export const ContentHeading = styled('h3', {
 
 export const Button = styled('button', {
   base: {
-    borderRadius: 'full',
+    borderRadius: 'lg',
     borderWidth: 'thin',
     borderColor: 'stone.400',
     paddingX: 6,

@@ -74,26 +74,23 @@ export default function ContentRenderer({ data, className, onFileUpload }: Conte
               background: 'none',
               boxSizing: 'border-box',
             },
+            '&::part(handle)': {
+              background: 'rgba(255, 255, 255, 0.15)',
+            },
             '&::part(header)': {
               boxSizing: 'border-box',
-              paddingBottom: 2,
               background: 'rgba(22, 22, 22, 0.95)',
               backdropFilter: 'blur(8px)',
               zIndex: 1,
             },
             '&::part(content)': {
-              padding: 2,
+              padding: 0,
               boxSizing: 'border-box',
               background: 'rgba(22, 22, 22, 0.95)',
               backdropFilter: 'blur(8px)',
             },
             '&::part(footer)': {
-              padding: 4,
-              paddingBottom: 'calc(env(safe-area-inset-bottom) + 1rem)',
-              boxSizing: 'border-box',
-              background: 'rgba(22, 22, 22, 0.95)',
-              backdropFilter: 'blur(8px)',
-              zIndex: 1,
+              display: 'none',
             },
           }),
         )}
@@ -126,16 +123,6 @@ export default function ContentRenderer({ data, className, onFileUpload }: Conte
           value={value}
           onFileUpload={handleFileUpload}
         />
-
-        {value && (
-          <div slot="footer">
-            <ContentAction
-              value={value}
-              isUrl={isUrl}
-              onFileUpload={handleFileUpload}
-            />
-          </div>
-        )}
       </BottomSheet>
     </div>
   );
@@ -147,6 +134,7 @@ interface ContentRendererContentProps {
   isUrl: boolean;
   onFileUpload?: (file: File) => void;
 }
+
 function ContentRendererContent({
   error,
   value,
@@ -169,36 +157,43 @@ function ContentRendererContent({
 
   if (!value) {
     return (
-      <div
-        className={cx(
-          css({
-            padding: 4,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDir: 'column',
-            gap: 6,
-          }),
-        )}
-      >
-        <div>
-          <Button onClick={() => inputRef.current?.click()}>Upload file</Button>
-          <input
-            ref={inputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className={css({ display: 'none' })}
-          />
-        </div>
+      <div className={cssWrapper}>
+        <Button onClick={() => inputRef.current?.click()}>Upload file</Button>
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className={css({ display: 'none' })}
+        />
       </div>
     );
   }
 
   return (
-    <ContentCard
-      value={value}
-      isUrl={isUrl}
-    />
+    <div className={cssWrapper}>
+      <ContentCard
+        value={value}
+        isUrl={isUrl}
+      />
+      <div className={css({ width: 'full' })}>
+        <ContentAction
+          value={value}
+          isUrl={isUrl}
+          onFileUpload={onFileUpload}
+          className={css({})}
+        />
+      </div>
+    </div>
   );
 }
+
+const cssWrapper = css({
+  padding: 8,
+  paddingTop: 6,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexDir: 'column',
+  gap: 6,
+});
