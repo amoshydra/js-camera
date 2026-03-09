@@ -7,7 +7,7 @@ import { css, cx } from '~styled-system/css';
 import ContentAction from './ContentAction';
 import ContentCard from './ContentCard';
 import ErrorDisplay from './ErrorDisplay';
-import { QrCodeIcon, UploadIcon } from './Icons';
+import { UploadIcon } from './Icons';
 import { Button, ContentHeading } from './Style';
 import { useLastGoodValue } from './useLastGoodValue';
 
@@ -160,9 +160,6 @@ function ContentRendererContent({
   if (!value) {
     return (
       <div className={cssEmptyState}>
-        <div className={cssEmptyIcon}>
-          <QrCodeIcon />
-        </div>
         <p className={cssEmptyText}>Scan or upload a QR code</p>
         <Button onClick={() => inputRef.current?.click()}>
           <span className={cssUploadIcon}>
@@ -215,24 +212,12 @@ const cssEmptyState = css({
   justifyContent: 'center',
   gap: 4,
   padding: 8,
-});
-
-const cssEmptyIcon = css({
-  width: 20,
-  height: 20,
-  color: 'zinc.600',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  '& svg': {
-    width: 'full',
-    height: 'full',
-  },
+  paddingTop: 4,
 });
 
 const cssEmptyText = css({
   fontSize: 'sm',
-  color: 'zinc.600',
+  color: 'zinc.400',
   margin: 0,
   textAlign: 'center',
 });
