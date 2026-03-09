@@ -172,10 +172,7 @@ export default function QrReader({ videoElement, disabled = false, onChange }: Q
   }, [canScan, scan]);
 
   return (
-    <div
-      data-debug={showDebug}
-      className={cssCanvasWrapper}
-    >
+    <div className={cssCanvasWrapper}>
       {showDebug && (
         <QrReaderDebug
           videoElement={videoElement}
@@ -193,10 +190,7 @@ export default function QrReader({ videoElement, disabled = false, onChange }: Q
 }
 
 const cssCanvasWrapper = css({
-  display: 'none',
-  '&[data-debug="true"]': {
-    display: 'flex',
-  },
-
-  background: 'rgba(0, 0, 0, 0.8)',
+  position: 'relative',
+  width: 'full',
+  height: 'full',
 });
