@@ -1,8 +1,8 @@
-import { useDocumentVisibilityChange } from './hooks/useVisibilityChange';
+import { useIdle } from './hooks/useIdle';
 import QrScanner from './pages/QrScanner';
 
 export default function App() {
-  const documentVisible = useDocumentVisibilityChange();
+  const isIdle = useIdle();
 
-  return <QrScanner disabled={documentVisible} />;
+  return <QrScanner disabled={isIdle} />;
 }
