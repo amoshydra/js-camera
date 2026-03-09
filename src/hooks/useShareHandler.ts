@@ -1,48 +1,41 @@
 import { useEffect, useState } from 'react';
 
-interface FileSystemFileHandle {
-  kind: 'file';
-  name: string;
-  getFile(): Promise<File>;
-}
-
-interface LaunchParams {
-  files?: FileSystemFileHandle[];
-}
-
-interface LaunchQueue {
-  setLaunchConsumer(consumer: (params: LaunchParams) => void): void;
-}
-
 interface SharedFile {
   file: File;
   webkitRelativePath: string;
 }
 
-export function useShareHandler() {
+export function useShareHandler(): SharedFile | null {
   const [sharedFile, setSharedFile] = useState<SharedFile | null>(null);
 
   useEffect(() => {
-    if (!('LaunchQueue' in window)) {
-      return;
-    }
-
-    const launchQueue = window.LaunchQueue as unknown as LaunchQueue;
-    const launchConsumer = async (launchParams: LaunchParams) => {
-      const files = launchParams.files;
-      if (files && files.length > 0) {
-        const fileHandle = files[0];
-        if (fileHandle.kind === 'file') {
-          const file = await (fileHandle as FileSystemFileHandle).getFile();
-          setSharedFile({
-            file,
-            webkitRelativePath: file.webkitRelativePath,
-          });
-        }
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const launchQueue = (window as any).LaunchQueue;
+      if (typeof launchQueue?.setLaunchConsumer !== 'function') {
+        return;
       }
-    };
 
-    launchQueue.setLaunchConsumer(launchConsumer);
+      const launchConsumer = async (launchParams: {
+        files?: Array<{ kind: string; getFile: () => Promise<File> }>;
+      }) => {
+        const files = launchParams.files;
+        if (files && files.length > 0) {
+          const fileHandle = files[0];
+          if (fileHandle.kind === 'file') {
+            const file = await fileHandle.getFile();
+            setSharedFile({
+              file,
+              webkitRelativePath: file.webkitRelativePath,
+            });
+          }
+        }
+      };
+
+      launchQueue.setLaunchConsumer(launchConsumer);
+    } catch {
+      // Not supported or error
+    }
   }, []);
 
   return sharedFile;

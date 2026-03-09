@@ -46,10 +46,12 @@ export default defineConfig({
           method: 'POST',
           enctype: 'multipart/form-data',
           params: {
-            files: {
-              name: 'file',
-              accept: ['image/*'],
-            },
+            files: [
+              {
+                name: 'file',
+                accept: ['image/*'],
+              },
+            ],
           },
         },
       },
