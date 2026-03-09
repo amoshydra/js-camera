@@ -44,7 +44,7 @@ const cssContentAnchor = css({
   wordBreak: 'break-word',
   lineHeight: '1.25',
   textDecoration: 'none',
-  color: 'blue.800',
+  color: 'blue.500',
   _active: {
     color: 'blue.700',
   },
