@@ -67,6 +67,7 @@ export default function CameraFeed({ onReady, disabled }: CameraFeedProps) {
         applyTorch={applyTorch}
         applyZoom={applyZoom}
         onFlip={flipCamera}
+        className={css({ marginTop: 2 })}
       />
     </>
   );

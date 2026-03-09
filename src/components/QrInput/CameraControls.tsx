@@ -1,4 +1,4 @@
-import { css } from '~styled-system/css';
+import { css, cx } from '~styled-system/css';
 import CameraControlsSlider from './CameraControlsSlider';
 
 interface CameraControlsProps {
@@ -8,6 +8,7 @@ interface CameraControlsProps {
   applyTorch?: (enabled: boolean) => Promise<boolean>;
   applyZoom?: (zoom: number) => Promise<boolean>;
   onFlip?: () => void;
+  className: string;
 }
 
 export default function CameraControls({
@@ -17,6 +18,7 @@ export default function CameraControls({
   applyTorch,
   applyZoom,
   onFlip,
+  className,
 }: CameraControlsProps) {
   const hasZoom = capabilities && 'zoom' in capabilities;
   const hasTorch = capabilities && 'torch' in capabilities;
@@ -34,7 +36,7 @@ export default function CameraControls({
     : 1;
 
   return (
-    <div className={cssWrapper}>
+    <div className={cx(className, cssWrapper)}>
       <button
         className={cssButton}
         onClick={() => applyTorch?.(!torchEnabled)}
@@ -52,8 +54,6 @@ export default function CameraControls({
           onZoomLevelChange={(z) => applyZoom(z)}
         />
       )}
-
-      {!hasZoom && <div className={cssSpacer} />}
 
       <button
         className={cssButton}
