@@ -1,5 +1,6 @@
 import { css, cx } from '~styled-system/css';
 import CameraControlsSlider from './CameraControlsSlider';
+import { FlashlightOnIcon, FlashlightOffIcon, FlipCameraIcon } from './Icons';
 
 interface CameraControlsProps {
   torchEnabled?: boolean;
@@ -42,8 +43,9 @@ export default function CameraControls({
         onClick={() => applyTorch?.(!torchEnabled)}
         disabled={!hasTorch}
         title={hasTorch ? 'Toggle flashlight' : 'Flashlight not supported'}
+        aria-label={torchEnabled ? 'Turn off flashlight' : 'Turn on flashlight'}
       >
-        {torchEnabled ? '🔦' : '💡'}
+        {torchEnabled ? <FlashlightOnIcon /> : <FlashlightOffIcon />}
       </button>
 
       {hasZoom && (
@@ -59,8 +61,9 @@ export default function CameraControls({
         className={cssButton}
         onClick={onFlip}
         title="Switch camera"
+        aria-label="Switch camera"
       >
-        🔄
+        <FlipCameraIcon />
       </button>
     </div>
   );
@@ -93,8 +96,4 @@ const cssButton = css({
   '&:hover:not(:disabled)': {
     backgroundColor: 'stone.700',
   },
-});
-
-const cssSpacer = css({
-  flex: 1,
 });

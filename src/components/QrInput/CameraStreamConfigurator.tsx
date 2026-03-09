@@ -4,6 +4,7 @@ import Dialog from '../Dialog/Dialog';
 import { configStore } from './CameraStreamConfigurator.lib';
 import CameraStreamConfiguratorMenu from './CameraStreamConfiguratorMenu';
 import { VideoStreamConstrain } from './ConfigurationStorage';
+import { SettingsIcon } from './Icons';
 
 interface CameraStreamConfiguratorProps {
   value?: VideoStreamConstrain;
@@ -28,8 +29,9 @@ export default function CameraStreamConfigurator({
       <button
         onClick={() => setShowConfiguratorUi((v) => !v)}
         className={cssButton}
+        aria-label="Open camera settings"
       >
-        ⚙
+        <SettingsIcon />
       </button>
 
       {showConfiguratorUi && (
@@ -70,7 +72,7 @@ const cssConfigurator = css({
   width: 'full',
   boxSizing: 'border-box',
   placeSelf: 'start end',
-  margin: 2,
+  margin: 4,
   borderRadius: 'sm',
   color: 'white',
   backgroundColor: 'rgba(0, 0, 0, 0.85)',

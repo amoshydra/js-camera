@@ -1,6 +1,7 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { css } from '~styled-system/css';
 import { VideoStreamConstrain } from './ConfigurationStorage';
+import { CloseIcon } from './Icons';
 
 interface CameraStreamConfiguratorMenuProps {
   className?: string;
@@ -60,8 +61,9 @@ export default function CameraStreamConfiguratorMenu({
       <button
         onClick={onClose}
         className={cssButton}
+        aria-label="Close settings"
       >
-        ❌
+        <CloseIcon />
       </button>
 
       <form className={css({ display: 'grid', gap: 4 })}>
@@ -108,6 +110,7 @@ const cssButton = css({
   fontSize: '1rem',
   backgroundColor: 'rgba(0, 0, 0, 0)',
   border: 'none',
+  margin: 2,
 });
 
 const cssInput = css({
