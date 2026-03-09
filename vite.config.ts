@@ -41,6 +41,17 @@ export default defineConfig({
           },
         ],
         screenshots: [],
+        share_target: {
+          action: '/',
+          method: 'POST',
+          enctype: 'multipart/form-data',
+          params: {
+            files: {
+              name: 'file',
+              accept: ['image/*'],
+            },
+          },
+        },
       },
     }),
   ],

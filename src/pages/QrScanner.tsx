@@ -7,14 +7,17 @@ import QrInput from '../components/QrInput/QrInput';
 
 interface QrScannerProps {
   disabled?: boolean;
+  initialData?: QrReaderData;
 }
 
-export default function QrScanner({ disabled = false }: QrScannerProps) {
-  const [data, setData] = useState<QrReaderData>({
-    data: null,
-    error: null,
-    scannerType: 'native',
-  });
+export default function QrScanner({ disabled = false, initialData }: QrScannerProps) {
+  const [data, setData] = useState<QrReaderData>(
+    initialData ?? {
+      data: null,
+      error: null,
+      scannerType: 'native',
+    },
+  );
 
   return (
     <>
