@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { css, cx } from '~styled-system/css';
 
 interface CameraVideoProps {
   stream: MediaStream | null;
@@ -27,7 +26,7 @@ export default function CameraVideo({ stream, onReady, className }: CameraVideoP
   return (
     <video
       ref={videoRef}
-      className={cx(cssVideo, className)}
+      className={className}
       autoPlay
       playsInline
       muted
@@ -35,10 +34,3 @@ export default function CameraVideo({ stream, onReady, className }: CameraVideoP
     />
   );
 }
-
-const cssVideo = css({
-  width: '100%',
-  aspectRatio: '1 / 1',
-  background: 'zinc.900',
-  objectFit: 'contain',
-});

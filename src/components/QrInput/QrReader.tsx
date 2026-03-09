@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { css } from '~styled-system/css';
 import {
-  detectQRCodes as nativeDetectQRCodes,
   isBarcodeDetectorSupported,
-  type QrReaderData,
+  detectQRCodes as nativeDetectQRCodes,
   type DetectedBarcode,
+  type QrReaderData,
 } from '../../lib/barcodeScanner';
 import { detectQRCodes as legacyDetectQRCodes } from '../../lib/legacyBarcodeScanner';
 import { queryParams } from '../../lib/queryParams';
@@ -14,20 +14,12 @@ const SCAN_FPS = 2;
 const FRAME_INTERVAL = 1000 / SCAN_FPS;
 
 interface QrReaderProps {
-  debug?: boolean;
   videoElement: HTMLVideoElement | null;
-  disabled?: boolean;
-  paused?: boolean;
-  onChange?: (data: QrReaderData) => void;
+  disabled: boolean;
+  onChange: (data: QrReaderData) => void;
 }
 
-export default function QrReader({
-  debug = false,
-  videoElement,
-  disabled = false,
-  paused = false,
-  onChange,
-}: QrReaderProps) {
+export default function QrReader({ videoElement, disabled = false, onChange }: QrReaderProps) {
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
@@ -44,8 +36,8 @@ export default function QrReader({
     onChangeRef.current = onChange;
   }, [onChange]);
 
-  const showDebug = debug || queryParams.debug;
-  const canScan = !disabled && !paused && !!videoElement && isVideoReady;
+  const showDebug = queryParams.debug;
+  const canScan = !disabled && !!videoElement && isVideoReady;
 
   useEffect(() => {
     if (queryParams.scanner === 'legacy') {

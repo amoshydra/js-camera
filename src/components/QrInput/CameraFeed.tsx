@@ -5,17 +5,17 @@ import { useCameraStreamReceiver } from './CameraStreamReceiver.hook';
 import CameraVideo from './CameraVideo';
 
 interface CameraFeedProps {
-  onReady?: (videoEl: HTMLVideoElement) => void;
-  paused?: boolean;
+  onReady: (videoEl: HTMLVideoElement) => void;
+  disabled: boolean;
 }
 
-export default function CameraFeed({ onReady, paused = false }: CameraFeedProps) {
+export default function CameraFeed({ onReady, disabled }: CameraFeedProps) {
   const hasGetUserMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
   const mediaDevicesSupportError = hasGetUserMedia
     ? null
     : new Error('mediaDevices is not supported');
   const { stream, loading, error, onVideoStreamContrainsChange, videoStreamConstraints } =
-    useCameraStreamReceiver(paused);
+    useCameraStreamReceiver(disabled);
 
   const resolvedError = mediaDevicesSupportError || error || null;
   if (resolvedError) {
@@ -31,6 +31,10 @@ export default function CameraFeed({ onReady, paused = false }: CameraFeedProps)
     return <div className={cx(cssWrapper, cssViewfinderLiked)}>Requesting camera access...</div>;
   }
 
+  if (!stream) {
+    return <div className={cx(cssWrapper, cssViewfinderLiked)}>Tap to activate</div>;
+  }
+
   return (
     <div className={cssWrapper}>
       <CameraStreamConfigurator
@@ -38,6 +42,7 @@ export default function CameraFeed({ onReady, paused = false }: CameraFeedProps)
         onUpdateModelValue={onVideoStreamContrainsChange}
       />
       <CameraVideo
+        className={cssViewFinder}
         stream={stream}
         onReady={onReady}
       />
@@ -53,12 +58,16 @@ const cssWrapper = css({
   overflow: 'hidden',
 });
 
-const cssViewfinderLiked = css({
+const cssViewFinderCss = css.raw({
   aspectRatio: '1 / 1',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
-  padding: 2,
   textAlign: 'center',
 });
+
+const cssViewFinder = css(cssViewFinderCss, {
+  background: 'zinc.900',
+});
+const cssViewfinderLiked = css(cssViewFinderCss, {});
