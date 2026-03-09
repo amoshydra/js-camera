@@ -7,7 +7,7 @@ import {
   type QrReaderData,
 } from '../../lib/barcodeScanner';
 import { detectQRCodes as legacyDetectQRCodes } from '../../lib/legacyBarcodeScanner';
-import { queryParams } from '../../lib/queryParams';
+import { settingsStore } from './CameraStreamConfigurator.lib';
 import QrReaderDebug from './QrReaderDebug';
 
 const SCAN_FPS = 2;
@@ -25,6 +25,7 @@ export default function QrReader({ videoElement, disabled = false, onChange }: Q
   const [lastError, setLastError] = useState<string | null>(null);
   const [scanCount, setScanCount] = useState(0);
   const [scannerType, setScannerType] = useState<'native' | 'legacy'>('native');
+  const [urlVersion, setUrlVersion] = useState(0);
 
   const animationFrameRef = useRef<number | null>(null);
   const lastFrameTimeRef = useRef<number>(0);
@@ -36,11 +37,28 @@ export default function QrReader({ videoElement, disabled = false, onChange }: Q
     onChangeRef.current = onChange;
   }, [onChange]);
 
-  const showDebug = queryParams.debug;
+  useEffect(() => {
+    const handleSettingsChange = () => {
+      setUrlVersion((v) => v + 1);
+    };
+    window.addEventListener('js-camera-settings-change', handleSettingsChange);
+    return () => window.removeEventListener('js-camera-settings-change', handleSettingsChange);
+  }, []);
+
+  const getSettings = () => {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      debug: params.get('debug') === 'true',
+      scanner: params.get('scanner') === 'legacy' ? 'legacy' : 'browser',
+    };
+  };
+
+  const currentSettings = urlVersion === 0 ? settingsStore.settings : getSettings();
+  const showDebug = currentSettings.debug;
   const canScan = !disabled && !!videoElement && isVideoReady;
 
   useEffect(() => {
-    if (queryParams.scanner === 'legacy') {
+    if (settingsStore.settings.scanner === 'legacy') {
       setScannerType('legacy');
       return;
     }
