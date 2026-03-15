@@ -17,6 +17,9 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
       registerType: 'autoUpdate',
       workbox: {
         globPatterns: ['**/*.{js,css,png,wasm,woff2,html}'],
@@ -59,7 +62,7 @@ export default defineConfig({
         ],
         screenshots: [],
         share_target: {
-          action: base + '?share',
+          action: base + 'share-target',
           method: 'POST',
           enctype: 'multipart/form-data',
           params: {
