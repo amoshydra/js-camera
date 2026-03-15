@@ -10,8 +10,9 @@ export function useShareHandler(): SharedFile | null {
   const [sharedFile, setSharedFile] = useState<SharedFile | null>(null);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const sharedId = params.get('shared');
+    const hash = window.location.hash;
+    const match = hash.match(/[#&]shared=([^&]+)/);
+    const sharedId = match ? match[1] : null;
 
     if (!sharedId) {
       return;
@@ -25,7 +26,7 @@ export function useShareHandler(): SharedFile | null {
         if (file) {
           setSharedFile({ file, webkitRelativePath: '' });
 
-          window.history.replaceState({}, '', window.location.pathname);
+          window.history.replaceState({}, '', window.location.pathname + window.location.search);
 
           await deleteFile(db, sharedId);
         }

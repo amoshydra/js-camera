@@ -32,7 +32,7 @@ async function handleShare(event: FetchEvent): Promise<Response> {
 
     const redirectUrl = new URL(event.request.url);
     redirectUrl.pathname = redirectUrl.pathname.replace('/share-target', '');
-    redirectUrl.search = '?shared=' + id;
+    redirectUrl.hash = '?shared=' + id;
 
     return Response.redirect(redirectUrl.toString(), 303);
   } catch {
