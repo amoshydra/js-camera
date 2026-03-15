@@ -93,6 +93,7 @@ function _CameraFeed({ onReady, loading, stream, error }: _CameraFeedProps) {
 
 const cssWrapper = css({
   width: '100%',
+  flexShrink: 0,
   display: 'flex',
   flexDirection: 'column',
   gap: 2,
