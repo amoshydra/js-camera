@@ -3,6 +3,7 @@ import { css } from '~styled-system/css';
 import { VideoStreamConstrain } from './ConfigurationStorage';
 import { CloseIcon } from './Icons';
 import { settingsStore, Settings } from './CameraStreamConfigurator.lib';
+import { useServiceWorker } from '@/hooks/useServiceWorker';
 
 interface CameraStreamConfiguratorMenuProps {
   className?: string;
@@ -41,6 +42,7 @@ export default function CameraStreamConfiguratorMenu({
 }: CameraStreamConfiguratorMenuProps) {
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [settings, setSettings] = useState<Settings>(() => settingsStore.load());
+  const { needRefresh, updateServiceWorker } = useServiceWorker();
 
   useEffect(() => {
     navigator.mediaDevices.enumerateDevices().then((deviceList) => {
@@ -142,6 +144,14 @@ export default function CameraStreamConfiguratorMenu({
         </section>
 
         <div className={cssFooter}>
+          {needRefresh && (
+            <button
+              className={cssUpdateButton}
+              onClick={() => updateServiceWorker(true)}
+            >
+              Update available
+            </button>
+          )}
           <a
             href="https://github.com/amoshydra/js-camera"
             target="_blank"
@@ -293,6 +303,19 @@ const cssLink = css({
   fontSize: '0.75rem',
   '&:hover': {
     textDecoration: 'underline',
+  },
+});
+
+const cssUpdateButton = css({
+  fontSize: '0.75rem',
+  padding: '0.25rem 0.5rem',
+  backgroundColor: 'green.600',
+  color: 'white',
+  border: 'none',
+  borderRadius: '4px',
+  cursor: 'pointer',
+  '&:hover': {
+    backgroundColor: 'green.500',
   },
 });
 
