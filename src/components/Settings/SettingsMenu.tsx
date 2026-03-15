@@ -1,24 +1,20 @@
 import { useState } from 'react';
 import { css, cx } from '~styled-system/css';
 import Dialog from '../Dialog/Dialog';
-import { configStore } from './CameraStreamConfigurator.lib';
-import CameraStreamConfiguratorMenu from './CameraStreamConfiguratorMenu';
-import { VideoStreamConstrain } from './ConfigurationStorage';
-import { SettingsIcon } from './Icons';
+import { configStore } from '../QrInput/CameraStreamConfigurator.lib';
+import { VideoStreamConstrain } from '../QrInput/ConfigurationStorage';
+import { SettingsIcon } from '../QrInput/Icons';
 import { useServiceWorker } from '@/hooks/useServiceWorker';
+import SettingsMenuContent from './SettingsMenuContent';
 
-interface CameraStreamConfiguratorProps {
+interface SettingsMenuProps {
   value?: VideoStreamConstrain;
   onUpdateModelValue?: (value: VideoStreamConstrain) => void;
   className?: string;
 }
 
-export default function CameraStreamConfigurator({
-  value,
-  onUpdateModelValue,
-  className,
-}: CameraStreamConfiguratorProps) {
-  const [showConfiguratorUi, setShowConfiguratorUi] = useState(false);
+export default function SettingsMenu({ value, onUpdateModelValue, className }: SettingsMenuProps) {
+  const [showSettingsUi, setShowSettingsUi] = useState(false);
   const { needRefresh } = useServiceWorker();
 
   const updateConfig = (config: VideoStreamConstrain) => {
@@ -29,24 +25,24 @@ export default function CameraStreamConfigurator({
   return (
     <div className={cx(cssWrapper, className)}>
       <button
-        onClick={() => setShowConfiguratorUi((v) => !v)}
+        onClick={() => setShowSettingsUi((v) => !v)}
         className={cssButton}
-        aria-label="Open camera settings"
+        aria-label="Open settings"
       >
         <SettingsIcon />
         {needRefresh && <span className={cssPulseDot} />}
       </button>
 
-      {showConfiguratorUi && (
+      {showSettingsUi && (
         <Dialog
           className={cssConfigurator}
-          open={showConfiguratorUi}
-          onClose={() => setShowConfiguratorUi(false)}
+          open={showSettingsUi}
+          onClose={() => setShowSettingsUi(false)}
         >
-          <CameraStreamConfiguratorMenu
-            value={value}
-            onUpdateModelValue={updateConfig}
-            onClose={() => setShowConfiguratorUi(false)}
+          <SettingsMenuContent
+            cameraValue={value}
+            onCameraValueChange={updateConfig}
+            onClose={() => setShowSettingsUi(false)}
           />
         </Dialog>
       )}
@@ -69,6 +65,7 @@ const cssButton = css({
   margin: '0.4em',
   borderRadius: 'md',
   color: 'white',
+  cursor: 'pointer',
 });
 
 const cssConfigurator = css({

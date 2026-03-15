@@ -1,37 +1,36 @@
 import { css, cx } from '~styled-system/css';
 import CameraControls from './CameraControls';
 import CameraFeedErrorPresenter from './CameraFeedErrorPresenter';
-import CameraStreamConfigurator from './CameraStreamConfigurator';
-import { useCameraStreamReceiver } from './CameraStreamReceiver.hook';
 import CameraVideo from './CameraVideo';
 
 interface CameraFeedProps {
   onReady: (videoEl: HTMLVideoElement) => void;
-  disabled: boolean;
+  stream: MediaStream | null;
+  loading: boolean;
+  error: Error | null;
+  torchEnabled: boolean;
+  zoomLevel: number;
+  capabilities: MediaTrackCapabilities | null;
+  applyTorch: (enabled: boolean) => Promise<boolean>;
+  applyZoom: (zoom: number) => Promise<boolean>;
+  flipCamera: () => void;
 }
 
-export default function CameraFeed({ onReady, disabled }: CameraFeedProps) {
-  const {
-    stream,
-    loading,
-    error,
-    onVideoStreamContrainsChange,
-    videoStreamConstraints,
-    torchEnabled,
-    zoomLevel,
-    capabilities,
-    applyTorch,
-    applyZoom,
-    flipCamera,
-  } = useCameraStreamReceiver(disabled);
-
+export default function CameraFeed({
+  onReady,
+  stream,
+  loading,
+  error,
+  torchEnabled,
+  zoomLevel,
+  capabilities,
+  applyTorch,
+  applyZoom,
+  flipCamera,
+}: CameraFeedProps) {
   return (
     <>
       <div className={cssWrapper}>
-        <CameraStreamConfigurator
-          value={videoStreamConstraints}
-          onUpdateModelValue={onVideoStreamContrainsChange}
-        />
         <_CameraFeed
           onReady={onReady}
           loading={loading}
@@ -55,8 +54,8 @@ export default function CameraFeed({ onReady, disabled }: CameraFeedProps) {
 interface _CameraFeedProps {
   onReady: (videoEl: HTMLVideoElement) => void;
   loading: boolean;
-  stream: MediaStream;
-  error: Error;
+  stream: MediaStream | null;
+  error: Error | null;
 }
 
 function _CameraFeed({ onReady, loading, stream, error }: _CameraFeedProps) {
@@ -98,7 +97,6 @@ const cssWrapper = css({
   flexDirection: 'column',
   gap: 2,
   background: 'stone.900',
-  position: 'relative',
   borderRadius: 'xl',
   overflow: 'hidden',
 });

@@ -1,8 +1,11 @@
 import { type QrReaderData } from '@/lib/barcodeScanner';
 import { useState } from 'react';
-import { cx } from '~styled-system/css';
+import { css, cx } from '~styled-system/css';
 import CameraFeed from './CameraFeed';
 import QrReader from './QrReader';
+import { useCameraStreamReceiver } from './CameraStreamReceiver.hook';
+import SettingsMenu from '../Settings/SettingsMenu';
+import { configStore } from './CameraStreamConfigurator.lib';
 
 interface QrInputProps {
   disabled?: boolean;
@@ -14,11 +17,43 @@ export default function QrInput({ disabled = false, onChange, className }: QrInp
   const [cameraFeedVideoElement, setCameraFeedVideoElement] = useState<HTMLVideoElement | null>(
     null,
   );
+
+  const {
+    stream,
+    loading,
+    error,
+    videoStreamConstraints,
+    onVideoStreamContrainsChange,
+    torchEnabled,
+    zoomLevel,
+    capabilities,
+    applyTorch,
+    applyZoom,
+    flipCamera,
+  } = useCameraStreamReceiver(disabled);
+
+  const updateConfig = (config: typeof videoStreamConstraints) => {
+    configStore.store(config);
+    onVideoStreamContrainsChange(configStore.load());
+  };
+
   return (
-    <div className={cx(className)}>
+    <div className={cx(cssWrapper, className)}>
+      <SettingsMenu
+        value={videoStreamConstraints}
+        onUpdateModelValue={updateConfig}
+      />
       <CameraFeed
         onReady={setCameraFeedVideoElement}
-        disabled={disabled}
+        stream={stream}
+        loading={loading}
+        error={error}
+        torchEnabled={torchEnabled}
+        zoomLevel={zoomLevel}
+        capabilities={capabilities}
+        applyTorch={applyTorch}
+        applyZoom={applyZoom}
+        flipCamera={flipCamera}
       />
       <QrReader
         disabled={disabled}
@@ -28,3 +63,11 @@ export default function QrInput({ disabled = false, onChange, className }: QrInp
     </div>
   );
 }
+
+const cssWrapper = css({
+  position: 'relative',
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 2,
+});

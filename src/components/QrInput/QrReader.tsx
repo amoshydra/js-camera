@@ -7,7 +7,7 @@ import {
   type QrReaderData,
 } from '../../lib/barcodeScanner';
 import { detectQRCodes as legacyDetectQRCodes } from '../../lib/legacyBarcodeScanner';
-import { settingsStore } from './CameraStreamConfigurator.lib';
+import { settingsStore } from '../Settings/SettingsStore';
 import QrReaderDebug from './QrReaderDebug';
 
 const SCAN_FPS = 2;
