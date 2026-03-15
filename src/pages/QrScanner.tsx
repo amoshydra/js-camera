@@ -1,6 +1,6 @@
 import ScannedIndicator from '@/components/ScannedIndicator';
 import { type QrReaderData } from '@/lib/barcodeScanner';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { css } from '~styled-system/css';
 import ContentRenderer from '../components/ContentRenderer/ContentRenderer';
 import QrInput from '../components/QrInput/QrInput';
@@ -18,6 +18,12 @@ export default function QrScanner({ disabled = false, initialData }: QrScannerPr
       scannerType: 'native',
     },
   );
+
+  useEffect(() => {
+    if (initialData?.data) {
+      setData(initialData);
+    }
+  }, [initialData]);
 
   return (
     <>
