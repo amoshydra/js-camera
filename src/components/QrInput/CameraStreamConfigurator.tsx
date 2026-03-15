@@ -5,6 +5,7 @@ import { configStore } from './CameraStreamConfigurator.lib';
 import CameraStreamConfiguratorMenu from './CameraStreamConfiguratorMenu';
 import { VideoStreamConstrain } from './ConfigurationStorage';
 import { SettingsIcon } from './Icons';
+import { useServiceWorker } from '@/hooks/useServiceWorker';
 
 interface CameraStreamConfiguratorProps {
   value?: VideoStreamConstrain;
@@ -18,6 +19,7 @@ export default function CameraStreamConfigurator({
   className,
 }: CameraStreamConfiguratorProps) {
   const [showConfiguratorUi, setShowConfiguratorUi] = useState(false);
+  const { needRefresh } = useServiceWorker();
 
   const updateConfig = (config: VideoStreamConstrain) => {
     configStore.store(config);
@@ -32,6 +34,7 @@ export default function CameraStreamConfigurator({
         aria-label="Open camera settings"
       >
         <SettingsIcon />
+        {needRefresh && <span className={cssPulseDot} />}
       </button>
 
       {showConfiguratorUi && (
@@ -77,4 +80,15 @@ const cssConfigurator = css({
   color: 'white',
   backgroundColor: 'rgba(0, 0, 0, 0.85)',
   boxShadow: '8px 8px 32px rgba(0,0,0,0.2)',
+});
+
+const cssPulseDot = css({
+  position: 'absolute',
+  top: '4px',
+  right: '4px',
+  width: '8px',
+  height: '8px',
+  backgroundColor: 'green.500',
+  borderRadius: 'full',
+  animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
 });

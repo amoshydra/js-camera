@@ -20,6 +20,9 @@ importers:
       react-dom:
         specifier: ^19.2.4
         version: 19.2.4(react@19.2.4)
+      workbox-window:
+        specifier: ^7.4.0
+        version: 7.4.0
     devDependencies:
       '@pandacss/dev':
         specifier: ^1.8.2
@@ -5638,9 +5641,9 @@ snapshots:
   '@vue/language-core@3.0.10(typescript@5.9.3)':
     dependencies:
       '@volar/language-core': 2.4.23
-      '@vue/compiler-dom': 3.5.25
+      '@vue/compiler-dom': 3.5.29
       '@vue/compiler-vue2': 2.7.16
-      '@vue/shared': 3.5.25
+      '@vue/shared': 3.5.29
       alien-signals: 2.0.8
       muggle-string: 0.4.1
       path-browserify: 1.0.1

@@ -15,6 +15,10 @@ export default defineConfig({
           '0%': { opacity: 1 },
           '100%': { opacity: 0 },
         },
+        pulse: {
+          '0%, 100%': { opacity: 1 },
+          '50%': { opacity: 0.5 },
+        },
       },
     },
   },

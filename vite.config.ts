@@ -17,6 +17,23 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      registerType: 'autoUpdate',
+      workbox: {
+        globPatterns: ['**/*.{js,css,png,wasm,woff2,html}'],
+        runtimeCaching: [
+          {
+            urlPattern: /\.(?:wasm)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'wasm-cache',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365,
+              },
+            },
+          },
+        ],
+      },
       manifest: {
         name: 'QR Camera',
         description: 'A QR code scanner in the browser',
