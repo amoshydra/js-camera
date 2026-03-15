@@ -20,8 +20,8 @@ export default defineConfig({
       manifest: {
         name: 'QR Camera',
         description: 'A QR code scanner in the browser',
-        id: 'https://amoshydra.github.io/js-camera/',
-        start_url: 'https://amoshydra.github.io/js-camera/',
+        id: 'https://amoshydra.github.io' + base,
+        start_url: 'https://amoshydra.github.io' + base,
         display: 'fullscreen',
         categories: ['utilities'],
         background_color: '#080808',
@@ -42,7 +42,7 @@ export default defineConfig({
         ],
         screenshots: [],
         share_target: {
-          action: '/',
+          action: base + '?share',
           method: 'POST',
           enctype: 'multipart/form-data',
           params: {
