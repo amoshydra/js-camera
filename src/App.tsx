@@ -1,3 +1,4 @@
+import ShareTargetDebugPanel from './components/ShareTarget/ShareTargetDebugPanel';
 import { useIdle } from './hooks/useIdle';
 import { useSharedQRCode } from './hooks/useSharedQRCode';
 import QrScanner from './pages/QrScanner';
@@ -7,9 +8,12 @@ export default function App() {
   const initialData = useSharedQRCode();
 
   return (
-    <QrScanner
-      disabled={isIdle}
-      initialData={initialData}
-    />
+    <>
+      <QrScanner
+        disabled={isIdle}
+        initialData={initialData}
+      />
+      <ShareTargetDebugPanel />
+    </>
   );
 }
