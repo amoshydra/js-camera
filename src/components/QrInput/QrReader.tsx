@@ -113,8 +113,6 @@ export default function QrReader({ videoElement, disabled = false, onChange }: Q
               lastResultRef.current = '';
             }, 2000);
           }
-        } else {
-          onChange?.({ data: null, error: null, scannerType });
         }
       } catch (e) {
         setLastError(String(e));
