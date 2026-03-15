@@ -20,7 +20,7 @@ export default function QrScanner({ disabled = false, initialData }: QrScannerPr
   );
 
   useEffect(() => {
-    if (initialData?.data) {
+    if (initialData?.data || initialData?.error) {
       setData(initialData);
     }
   }, [initialData]);
