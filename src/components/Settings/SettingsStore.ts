@@ -1,6 +1,7 @@
 export interface Settings {
   debug: boolean;
   scanner: 'browser' | 'legacy';
+  enableAiMode: boolean;
 }
 
 const SETTINGS_STORAGE_KEY = 'js-camera-settings';
@@ -16,7 +17,11 @@ export class SettingsStore {
     const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
     if (stored) {
       try {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored);
+        return {
+          ...this.getDefaultSettings(),
+          ...parsed,
+        };
       } catch {
         return this.getDefaultSettings();
       }
@@ -29,6 +34,7 @@ export class SettingsStore {
     return {
       debug: params.get('debug') === 'true',
       scanner: params.get('scanner') === 'legacy' ? 'legacy' : 'browser',
+      enableAiMode: params.get('ai') === 'true',
     };
   }
 
@@ -49,6 +55,11 @@ export class SettingsStore {
     } else {
       url.searchParams.delete('scanner');
     }
+    if (settings.enableAiMode) {
+      url.searchParams.set('ai', 'true');
+    } else {
+      url.searchParams.delete('ai');
+    }
     window.history.pushState({}, '', url.toString());
     window.dispatchEvent(new Event('js-camera-settings-change'));
   }
@@ -61,6 +72,12 @@ export class SettingsStore {
 
   setScanner(value: 'browser' | 'legacy'): void {
     const newSettings = { ...this.settings, scanner: value };
+    this.store(newSettings);
+    this.updateUrl(newSettings);
+  }
+
+  setEnableAiMode(value: boolean): void {
+    const newSettings = { ...this.settings, enableAiMode: value };
     this.store(newSettings);
     this.updateUrl(newSettings);
   }

@@ -1,8 +1,12 @@
 import { css } from '~styled-system/css';
 import { VideoStreamConstrain } from '@/components/QrInput/ConfigurationStorage';
 import { CloseIcon } from '@/components/QrInput/Icons';
+import { settingsStore } from './SettingsStore';
+import { useState, useEffect } from 'react';
 import ScannerSettingsSection from './sections/ScannerSettingsSection';
 import CameraSettingsSection from './sections/CameraSettingsSection';
+import AiSettingsSection from './sections/AiSettingsSection';
+import ExperimentalSettingsSection from './sections/ExperimentalSettingsSection';
 import SettingsFooter from './SettingsFooter';
 
 interface SettingsMenuContentProps {
@@ -18,6 +22,16 @@ export default function SettingsMenuContent({
   onCameraValueChange,
   onClose,
 }: SettingsMenuContentProps) {
+  const [enableAiMode, setEnableAiMode] = useState(() => settingsStore.settings.enableAiMode);
+
+  useEffect(() => {
+    const handleSettingsChange = () => {
+      setEnableAiMode(settingsStore.settings.enableAiMode);
+    };
+    window.addEventListener('js-camera-settings-change', handleSettingsChange);
+    return () => window.removeEventListener('js-camera-settings-change', handleSettingsChange);
+  }, []);
+
   return (
     <div className={`${cssWrapper} ${className || ''}`}>
       <button
@@ -33,10 +47,22 @@ export default function SettingsMenuContent({
 
         <div className={cssDivider} />
 
+        <ExperimentalSettingsSection />
+
+        <div className={cssDivider} />
+
         <CameraSettingsSection
           value={cameraValue}
           onUpdateModelValue={onCameraValueChange}
         />
+
+        {enableAiMode && (
+          <>
+            <div className={cssDivider} />
+            <AiSettingsSection />
+          </>
+        )}
+
         <SettingsFooter />
       </div>
     </div>

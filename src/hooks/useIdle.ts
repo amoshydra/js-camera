@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 
-const IDLE_TIMEOUT = 30000;
+const DEFAULT_IDLE_TIMEOUT = 30000;
+const AI_MODE_IDLE_TIMEOUT = 300000; // 5 minutes
 
-export const useIdle = (timeout = IDLE_TIMEOUT) => {
+export const useIdle = (timeout = DEFAULT_IDLE_TIMEOUT) => {
   const [isIdle, setIsIdle] = useState(false);
   const lastActivityRef = useRef<number>(Date.now());
   const intervalRef = useRef<number | null>(null);
@@ -50,4 +51,8 @@ export const useIdle = (timeout = IDLE_TIMEOUT) => {
   }, [timeout, isIdle]);
 
   return isIdle;
+};
+
+export const getIdleTimeout = (mode: 'qr' | 'ai') => {
+  return mode === 'ai' ? AI_MODE_IDLE_TIMEOUT : DEFAULT_IDLE_TIMEOUT;
 };

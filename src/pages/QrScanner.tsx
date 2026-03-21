@@ -1,47 +1,107 @@
 import ScannedIndicator from '@/components/ScannedIndicator';
 import { type QrReaderData } from '@/lib/barcodeScanner';
-import { useEffect, useState } from 'react';
+import { aiConfigStore } from '@/lib/aiConfigStore';
+import { useEffect, useState, useRef } from 'react';
 import { css } from '~styled-system/css';
-import ContentRenderer from '../components/ContentRenderer/ContentRenderer';
 import QrInput from '../components/QrInput/QrInput';
+import ContentRenderer from '../components/ContentRenderer/ContentRenderer';
+import AiContentRenderer from '../components/AiInput/AiContentRenderer';
+import AiSetupModal from '../components/AiInput/AiSetupModal';
+import { useAiVision } from '../hooks/useAiVision';
+import { type Mode } from '../components/ModeToggle/ModeToggle';
 
 interface QrScannerProps {
   disabled?: boolean;
   initialData?: QrReaderData;
+  mode: Mode;
+  onModeChange: (mode: Mode) => void;
+  enableAiMode: boolean;
 }
 
-export default function QrScanner({ disabled = false, initialData }: QrScannerProps) {
-  const [data, setData] = useState<QrReaderData>(
+export default function QrScanner({
+  disabled = false,
+  initialData,
+  mode,
+  onModeChange,
+  enableAiMode,
+}: QrScannerProps) {
+  const [qrData, setQrData] = useState<QrReaderData>(
     initialData ?? {
       data: null,
       error: null,
       scannerType: 'native',
     },
   );
+  const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
+  const [showAiSetupModal, setShowAiSetupModal] = useState(false);
+  const hasShownSetupModal = useRef(false);
+
+  const isAiEnabled = mode === 'ai' && !disabled;
+
+  const { togglePause, askQuestion, ...aiState } = useAiVision(videoElement, isAiEnabled);
 
   useEffect(() => {
     if (initialData?.data || initialData?.error) {
-      setData(initialData);
+      setQrData(initialData);
     }
   }, [initialData]);
+
+  useEffect(() => {
+    if (mode === 'ai' && !aiConfigStore.isConfigured() && !hasShownSetupModal.current) {
+      setShowAiSetupModal(true);
+      hasShownSetupModal.current = true;
+    }
+  }, [mode]);
+
+  const handleConfigured = () => {
+    setShowAiSetupModal(false);
+  };
+
+  const handleModeChange = (newMode: Mode) => {
+    onModeChange(newMode);
+  };
+
+  const handleRetry = () => {
+    window.dispatchEvent(new Event('js-camera-ai-config-change'));
+  };
 
   return (
     <>
       <ScannedIndicator
-        data={data.data}
-        scannerType={data.scannerType}
+        data={mode === 'qr' ? qrData.data : null}
+        scannerType={qrData.scannerType}
       />
       <div className={cssWrapper}>
         <QrInput
           disabled={disabled}
-          onChange={setData}
+          onChange={setQrData}
           className={cssTop}
+          mode={mode}
+          onModeChange={handleModeChange}
+          onVideoElement={setVideoElement}
+          enableAiMode={enableAiMode}
         />
-        <ContentRenderer
-          data={data}
-          className={cssBottom}
-        />
+        {mode === 'qr' ? (
+          <ContentRenderer
+            data={qrData}
+            className={cssBottom}
+          />
+        ) : (
+          <AiContentRenderer
+            state={aiState}
+            onRetry={handleRetry}
+            onOpenSettings={() => setShowAiSetupModal(true)}
+            onPauseToggle={togglePause}
+            onAskQuestion={askQuestion}
+            className={cssBottom}
+          />
+        )}
       </div>
+      <AiSetupModal
+        open={showAiSetupModal}
+        onClose={() => setShowAiSetupModal(false)}
+        onConfigured={handleConfigured}
+      />
     </>
   );
 }
@@ -64,6 +124,7 @@ const cssWrapper = css({
     gap: 8,
   },
 });
+
 const cssTop = css({
   flexGrow: 0,
   flexShrink: 1,
@@ -73,6 +134,7 @@ const cssTop = css({
     flexBasis: '50%',
   },
 });
+
 const cssBottom = css({
   flexGrow: 1,
   flexShrink: 0,
