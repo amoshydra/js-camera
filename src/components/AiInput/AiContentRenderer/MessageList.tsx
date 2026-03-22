@@ -1,4 +1,5 @@
 import ReactMarkdown from 'react-markdown';
+import { useRef } from 'react';
 import { css } from '~styled-system/css';
 import { cssMarkdownMessage } from './styles';
 
@@ -19,48 +20,106 @@ export default function MessageList({ messages, streamingText, status }: Message
   const showStreaming = status === 'streaming' && streamingText;
 
   const hasMessages = messages.length > 0;
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  if (isLoading && messages.length === 0 && !streamingText) {
+    return (
+      <div
+        className={css({
+          padding: 4,
+          minHeight: '60px',
+        })}
+      >
+        <LoadingState status={status} />
+      </div>
+    );
+  }
 
   return (
     <div
+      ref={scrollContainerRef}
       className={css({
         padding: 4,
         minHeight: '60px',
+        overflowY: 'auto',
       })}
     >
-      {isLoading && messages.length === 0 && !streamingText ? (
-        <LoadingState status={status} />
-      ) : (
-        <div
-          className={css({
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 3,
-          })}
-        >
-          {showStreaming && <StreamingMessage streamingText={streamingText} />}
+      <div
+        className={css({
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 3,
+        })}
+      >
+        {showStreaming && <StreamingMessage streamingText={streamingText} />}
 
-          {hasMessages &&
-            messages
-              .slice(-10)
-              .reverse()
-              .map((msg, idx) => {
-                const time = new Date(msg.timestamp).toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  second: '2-digit',
-                });
-                return (
-                  <MessageItem
-                    key={idx}
-                    msg={msg}
-                    time={time}
-                  />
-                );
-              })}
+        {hasMessages &&
+          messages
+            .slice(-10)
+            .reverse()
+            .map((msg, idx) => {
+              const time = new Date(msg.timestamp).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+              });
+              return (
+                <MessageItem
+                  key={`${msg.role}-${msg.timestamp}-${idx}`}
+                  msg={msg}
+                  time={time}
+                />
+              );
+            })}
 
-          {!showStreaming && !hasMessages && <EmptyState />}
-        </div>
-      )}
+        {!showStreaming && !hasMessages && <EmptyState />}
+      </div>
+    </div>
+  );
+}
+
+function StreamingMessage({ streamingText }: { streamingText: string }) {
+  return (
+    <div
+      className={css({
+        marginBottom: 3,
+      })}
+    >
+      <span
+        className={css({
+          fontSize: 'xs',
+          color: 'zinc.500',
+          fontWeight: 'medium',
+        })}
+      >
+        AI
+      </span>
+      <div className={cssMarkdownMessage}>
+        <ReactMarkdown>{streamingText}</ReactMarkdown>
+      </div>
+    </div>
+  );
+}
+
+function MessageItem({ msg, time }: { msg: Message; time: string }) {
+  return (
+    <div
+      className={css({
+        marginBottom: 3,
+      })}
+    >
+      <span
+        className={css({
+          fontSize: 'xs',
+          color: 'zinc.500',
+          fontWeight: 'medium',
+        })}
+      >
+        {msg.role === 'user' ? 'You' : 'AI'} · {time}
+      </span>
+      <div className={cssMarkdownMessage}>
+        <ReactMarkdown>{msg.content}</ReactMarkdown>
+      </div>
     </div>
   );
 }
@@ -97,52 +156,6 @@ function LoadingState({ status }: { status: string }) {
       >
         {status === 'capturing' ? 'Capturing frame...' : 'Waiting to start...'}
       </p>
-    </div>
-  );
-}
-
-function MessageItem({ msg, time }: { msg: Message; time: string }) {
-  return (
-    <div
-      className={css({
-        marginBottom: 3,
-      })}
-    >
-      <span
-        className={css({
-          fontSize: 'xs',
-          color: 'zinc.500',
-          fontWeight: 'medium',
-        })}
-      >
-        {msg.role === 'user' ? 'You' : 'AI'} · {time}
-      </span>
-      <div className={cssMarkdownMessage}>
-        <ReactMarkdown>{msg.content}</ReactMarkdown>
-      </div>
-    </div>
-  );
-}
-
-function StreamingMessage({ streamingText }: { streamingText: string }) {
-  return (
-    <div
-      className={css({
-        marginBottom: 3,
-      })}
-    >
-      <span
-        className={css({
-          fontSize: 'xs',
-          color: 'zinc.500',
-          fontWeight: 'medium',
-        })}
-      >
-        AI
-      </span>
-      <div className={cssMarkdownMessage}>
-        <ReactMarkdown>{streamingText}</ReactMarkdown>
-      </div>
     </div>
   );
 }
