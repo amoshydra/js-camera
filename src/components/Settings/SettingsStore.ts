@@ -79,7 +79,6 @@ export class SettingsStore {
   setEnableAiMode(value: boolean): void {
     const newSettings = { ...this.settings, enableAiMode: value };
     this.store(newSettings);
-    this.updateUrl(newSettings);
   }
 }
 

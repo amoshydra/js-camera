@@ -1,14 +1,12 @@
+import { lazy, Suspense, useEffect, useState } from 'react';
 import ScannedIndicator from '@/components/ScannedIndicator';
 import { type QrReaderData } from '@/lib/barcodeScanner';
-import { aiConfigStore } from '@/lib/aiConfigStore';
-import { useEffect, useState, useRef } from 'react';
 import { css } from '~styled-system/css';
 import QrInput from '../components/QrInput/QrInput';
 import ContentRenderer from '../components/ContentRenderer/ContentRenderer';
-import AiContentRenderer from '../components/AiInput/AiContentRenderer';
-import AiSetupModal from '../components/AiInput/AiSetupModal';
-import { useAiVisionTopic } from '../hooks/useAiVisionTopic';
 import { type Mode } from '../components/ModeToggle/ModeToggle';
+
+const AiView = lazy(() => import('./AiView'));
 
 interface QrScannerProps {
   disabled?: boolean;
@@ -33,12 +31,6 @@ export default function QrScanner({
     },
   );
   const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
-  const [showAiSetupModal, setShowAiSetupModal] = useState(false);
-  const hasShownSetupModal = useRef(false);
-
-  const isAiEnabled = mode === 'ai' && !disabled;
-
-  const { togglePause, setTopic, ...aiState } = useAiVisionTopic(videoElement, isAiEnabled);
 
   useEffect(() => {
     if (initialData?.data || initialData?.error) {
@@ -46,23 +38,14 @@ export default function QrScanner({
     }
   }, [initialData]);
 
-  useEffect(() => {
-    if (mode === 'ai' && !aiConfigStore.isConfigured() && !hasShownSetupModal.current) {
-      setShowAiSetupModal(true);
-      hasShownSetupModal.current = true;
-    }
-  }, [mode]);
-
-  const handleConfigured = () => {
-    setShowAiSetupModal(false);
-  };
-
   const handleModeChange = (newMode: Mode) => {
     onModeChange(newMode);
   };
 
-  const handleRetry = () => {
-    window.dispatchEvent(new Event('js-camera-ai-config-change'));
+  const handleOpenAiSettings = () => {
+    if (mode !== 'ai') {
+      onModeChange('ai');
+    }
   };
 
   return (
@@ -87,21 +70,15 @@ export default function QrScanner({
             className={cssBottom}
           />
         ) : (
-          <AiContentRenderer
-            state={aiState}
-            onRetry={handleRetry}
-            onOpenSettings={() => setShowAiSetupModal(true)}
-            onPauseToggle={togglePause}
-            onSetTopic={setTopic}
-            className={cssBottom}
-          />
+          <Suspense fallback={<div className={cssBottom} />}>
+            <AiView
+              videoElement={videoElement}
+              disabled={disabled}
+              onOpenSettings={handleOpenAiSettings}
+            />
+          </Suspense>
         )}
       </div>
-      <AiSetupModal
-        open={showAiSetupModal}
-        onClose={() => setShowAiSetupModal(false)}
-        onConfigured={handleConfigured}
-      />
     </>
   );
 }
