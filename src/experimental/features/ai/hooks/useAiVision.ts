@@ -1,6 +1,7 @@
 import { aiConfigStore, DEFAULT_SYSTEM_PROMPT } from '../lib/aiConfigStore';
 import { AppError, ErrorCode } from '@/lib/errors';
 import { captureFrame } from '@/lib/frameCapture';
+import { useIdleContext } from '@/hooks/useIdle';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 const MAX_MESSAGES = 12;
@@ -151,6 +152,7 @@ export function useAiVision(
   const [configVersion, setConfigVersion] = useState(0);
   const isProcessingRef = useRef(false);
   const promptModifierRef = useRef(options?.promptModifier);
+  const { requestLongIdle, releaseLongIdle } = useIdleContext();
 
   useEffect(() => {
     promptModifierRef.current = options?.promptModifier;
@@ -589,6 +591,28 @@ export function useAiVision(
       isProcessingRef.current = false;
     }
   }, [isEnabled, state.isPaused]);
+
+  // Request/release long idle based on AI activity status
+  useEffect(() => {
+    const isActiveStatus =
+      state.status === 'waiting' ||
+      state.status === 'capturing' ||
+      state.status === 'streaming' ||
+      state.status === 'complete';
+
+    if (isActiveStatus) {
+      requestLongIdle();
+    } else {
+      releaseLongIdle();
+    }
+  }, [state.status, requestLongIdle, releaseLongIdle]);
+
+  // Release long idle on unmount
+  useEffect(() => {
+    return () => {
+      releaseLongIdle();
+    };
+  }, [releaseLongIdle]);
 
   return {
     ...state,

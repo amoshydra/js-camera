@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
-import { useIdle, getIdleTimeout } from './hooks/useIdle';
+import { IdleProvider, useIdleContext } from './hooks/useIdle';
 import { useSharedQRCode } from './hooks/useSharedQRCode';
 import { settingsStore } from './components/Settings/SettingsStore';
 import QrScanner from './pages/QrScanner';
 import { type Mode } from './components/ModeToggle/ModeToggle';
 
-export default function App() {
+function AppContent() {
+  const { isIdle } = useIdleContext();
   const [mode, setMode] = useState<Mode>('qr');
   const [enableAiMode, setEnableAiMode] = useState(() => settingsStore.settings.enableAiMode);
-  const isIdle = useIdle(getIdleTimeout(mode));
   const initialData = useSharedQRCode();
 
   useEffect(() => {
@@ -38,5 +38,13 @@ export default function App() {
       onModeChange={handleModeChange}
       enableAiMode={enableAiMode}
     />
+  );
+}
+
+export default function App() {
+  return (
+    <IdleProvider>
+      <AppContent />
+    </IdleProvider>
   );
 }
