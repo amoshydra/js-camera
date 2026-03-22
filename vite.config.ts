@@ -21,7 +21,8 @@ export default defineConfig({
       srcDir: 'src',
       filename: 'sw.ts',
       registerType: 'prompt',
-      workbox: {
+      workbox: {},
+      injectManifest: {
         globPatterns: ['**/*.{js,css,png,wasm,woff2,html}'],
       },
       manifest: {
