@@ -1,13 +1,20 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { css } from '~styled-system/css';
 
 interface TopicInputProps {
   topic: string | null | undefined;
+  editTopic?: string | null;
   onSetTopic?: (topic: string | null) => void;
 }
 
-export default function TopicInput({ topic, onSetTopic }: TopicInputProps) {
+export default function TopicInput({ topic, editTopic, onSetTopic }: TopicInputProps) {
   const [topicInput, setTopicInput] = useState('');
+
+  useEffect(() => {
+    if (editTopic) {
+      setTopicInput(editTopic);
+    }
+  }, [editTopic]);
 
   const handleSubmitTopic = () => {
     if (topicInput.trim() && onSetTopic) {
@@ -28,7 +35,6 @@ export default function TopicInput({ topic, onSetTopic }: TopicInputProps) {
       className={css({
         display: 'flex',
         gap: 2,
-        padding: 2,
         paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)',
       })}
     >

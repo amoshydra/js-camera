@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { css } from '~styled-system/css';
 import { PauseIcon } from './icons/PauseIcon';
+import { PinIcon } from './icons/PinIcon';
 import { PlayIcon } from './icons/PlayIcon';
 import TopicInput from './TopicInput';
 
@@ -18,8 +20,28 @@ export default function AiHeader({
   onPauseToggle,
   onSetTopic,
 }: AiHeaderProps) {
+  const [editTopic, setEditTopic] = useState<string | null>(null);
+
+  const handleEditTopic = (topicToEdit: string) => {
+    setEditTopic(topicToEdit);
+  };
+
+  const handleSetTopic = (newTopic: string | null) => {
+    onSetTopic?.(newTopic);
+    setEditTopic(null);
+  };
+
   return (
-    <>
+    <div
+      className={css({
+        px: 4,
+        py: 2,
+        pt: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 2,
+      })}
+    >
       <div
         className={css({
           display: 'flex',
@@ -27,9 +49,6 @@ export default function AiHeader({
           justifyContent: 'space-between',
           gap: 2,
           width: 'full',
-          px: 4,
-          py: 2,
-          pt: 0,
         })}
       >
         <StatusBadge
@@ -43,10 +62,16 @@ export default function AiHeader({
       </div>
       <TopicInput
         topic={topic}
-        onSetTopic={onSetTopic}
+        editTopic={editTopic}
+        onSetTopic={handleSetTopic}
       />
-      {topic && <TopicChip topic={topic} />}
-    </>
+      {topic && (
+        <TopicChip
+          topic={topic}
+          onEdit={handleEditTopic}
+        />
+      )}
+    </div>
   );
 }
 
@@ -137,24 +162,36 @@ function PauseButton({
   );
 }
 
-function TopicChip({ topic }: { topic: string }) {
+function TopicChip({ topic, onEdit }: { topic: string; onEdit: (topic: string) => void }) {
   return (
-    <div
+    <button
+      type="button"
+      onClick={() => onEdit(topic)}
       className={css({
         display: 'flex',
-        alignItems: 'center',
-        gap: 1,
+        alignItems: 'flex-start',
+        textAlign: 'left',
+        gap: 2,
         padding: '4px 8px',
         backgroundColor: 'blue.500',
-        borderRadius: 'full',
+        borderRadius: 'xl',
         fontSize: 'xs',
         color: 'white',
-        margin: '0 8px 8px 8px',
         width: 'fit-content',
+        border: 'none',
+        cursor: 'pointer',
+        transition: 'background-color 0.15s',
+        '&:hover': {
+          backgroundColor: 'blue.400',
+        },
+        '& svg': {
+          flexShrink: 0,
+          marginTop: 1,
+        },
       })}
     >
-      <span>📌</span>
+      <PinIcon />
       <span>{topic}</span>
-    </div>
+    </button>
   );
 }
