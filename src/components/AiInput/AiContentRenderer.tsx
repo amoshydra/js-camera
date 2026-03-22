@@ -5,11 +5,11 @@ import ReactMarkdown from 'react-markdown';
 import { css, cx } from '~styled-system/css';
 
 interface AiContentRendererProps {
-  state: AiVisionState;
+  state: AiVisionState & { topic?: string | null };
   onRetry?: () => void;
   onOpenSettings?: () => void;
   onPauseToggle?: () => void;
-  onAskQuestion?: (question: string) => void;
+  onSetTopic?: (topic: string | null) => void;
   className?: string;
 }
 
@@ -18,26 +18,26 @@ export default function AiContentRenderer({
   onRetry,
   onOpenSettings,
   onPauseToggle,
-  onAskQuestion,
+  onSetTopic,
   className,
 }: AiContentRendererProps) {
-  const { status, streamingText, lastError, isPaused, messages } = state;
-  const [questionInput, setQuestionInput] = useState('');
+  const { status, streamingText, lastError, isPaused, messages, topic } = state;
+  const [topicInput, setTopicInput] = useState('');
   const contentRef = useRef<HTMLDivElement>(null);
 
   const isProcessing = status === 'capturing' || status === 'streaming';
 
-  const handleSubmitQuestion = () => {
-    if (questionInput.trim() && onAskQuestion) {
-      onAskQuestion(questionInput.trim());
-      setQuestionInput('');
+  const handleSubmitTopic = () => {
+    if (topicInput.trim() && onSetTopic) {
+      onSetTopic(topicInput.trim());
+      setTopicInput('');
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSubmitQuestion();
+      handleSubmitTopic();
     }
   };
 
@@ -362,6 +362,25 @@ export default function AiContentRenderer({
         </div>
 
         <div slot="footer">
+          {topic && (
+            <div
+              className={css({
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                padding: '4px 8px',
+                backgroundColor: 'blue.500',
+                borderRadius: 'full',
+                fontSize: 'xs',
+                color: 'white',
+                margin: '4px 8px',
+                width: 'fit-content',
+              })}
+            >
+              <span>📌</span>
+              <span>{topic}</span>
+            </div>
+          )}
           <div
             className={css({
               display: 'flex',
@@ -393,9 +412,9 @@ export default function AiContentRenderer({
                   cursor: 'not-allowed',
                 },
               })}
-              placeholder="Type a question..."
-              value={questionInput}
-              onChange={(e) => setQuestionInput(e.target.value)}
+              placeholder={topic ? 'Update topic...' : 'Set a topic to focus...'}
+              value={topicInput}
+              onChange={(e) => setTopicInput(e.target.value)}
               onKeyDown={handleKeyDown}
             />
             <button
@@ -415,11 +434,31 @@ export default function AiContentRenderer({
                   cursor: 'not-allowed',
                 },
               })}
-              onClick={handleSubmitQuestion}
-              disabled={!questionInput.trim()}
+              onClick={handleSubmitTopic}
+              disabled={!topicInput.trim()}
             >
-              Send
+              {topic ? 'Update' : 'Set'}
             </button>
+            {topic && (
+              <button
+                className={css({
+                  padding: '8px 12px',
+                  fontSize: 'sm',
+                  backgroundColor: 'zinc.700',
+                  border: 'none',
+                  borderRadius: 'md',
+                  color: 'zinc.300',
+                  cursor: 'pointer',
+                  '&:hover': {
+                    backgroundColor: 'zinc.600',
+                    color: 'white',
+                  },
+                })}
+                onClick={() => onSetTopic?.(null)}
+              >
+                Clear
+              </button>
+            )}
           </div>
         </div>
       </BottomSheet>
