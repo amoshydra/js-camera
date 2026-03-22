@@ -1,6 +1,6 @@
 import type { AiVisionState } from '@/hooks/useAiVision';
 import { BottomSheet } from 'pure-web-bottom-sheet/react';
-import { CSSProperties, useEffect, useRef, useState } from 'react';
+import { CSSProperties, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { css, cx } from '~styled-system/css';
 
@@ -23,7 +23,6 @@ export default function AiContentRenderer({
 }: AiContentRendererProps) {
   const { status, streamingText, lastError, isPaused, messages, topic } = state;
   const [topicInput, setTopicInput] = useState('');
-  const contentRef = useRef<HTMLDivElement>(null);
 
   const isProcessing = status === 'capturing' || status === 'streaming';
 
@@ -41,13 +40,6 @@ export default function AiContentRenderer({
     }
   };
 
-  // Auto-scroll to bottom as content streams
-  useEffect(() => {
-    if (status === 'streaming' && contentRef.current) {
-      contentRef.current.scrollTop = contentRef.current.scrollHeight;
-    }
-  }, [streamingText, status, messages]);
-
   // Only show setup/error screens when there are no messages at all
   const hasMessages = messages.length > 0;
 
@@ -61,6 +53,7 @@ export default function AiContentRenderer({
           key="setup"
           tabIndex={0}
           content-height
+          nested-scroll
           style={
             {
               '--sheet-max-height': '75vh',
@@ -261,126 +254,6 @@ export default function AiContentRenderer({
               {isPaused ? <PlayIcon /> : <PauseIcon />}
             </button>
           </div>
-        </div>
-
-        <div
-          ref={contentRef}
-          className={css({
-            padding: 4,
-            minHeight: '60px',
-          })}
-        >
-          {(status === 'waiting' || status === 'capturing') &&
-          messages.length === 0 &&
-          !streamingText ? (
-            <div
-              className={css({
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 2,
-                padding: 4,
-              })}
-            >
-              <div
-                className={css({
-                  width: '20px',
-                  height: '20px',
-                  border: '2px solid',
-                  borderColor: 'zinc.600',
-                  borderTopColor: 'blue.500',
-                  borderRadius: 'full',
-                  animation: 'spin 1s linear infinite',
-                })}
-              />
-              <p
-                className={css({
-                  fontSize: 'sm',
-                  color: 'zinc.400',
-                  margin: 0,
-                })}
-              >
-                {status === 'capturing' ? 'Capturing frame...' : 'Waiting to start...'}
-              </p>
-            </div>
-          ) : (
-            <>
-              {messages.slice(-10).map((msg, idx) => (
-                <div
-                  key={idx}
-                  className={css({
-                    marginBottom: 3,
-                  })}
-                >
-                  <span
-                    className={css({
-                      fontSize: 'xs',
-                      color: 'zinc.500',
-                      fontWeight: 'medium',
-                    })}
-                  >
-                    {msg.role === 'user' ? 'You' : 'AI'}
-                  </span>
-                  <div className={cssMarkdownMessage}>
-                    <ReactMarkdown>{msg.content}</ReactMarkdown>
-                  </div>
-                </div>
-              ))}
-
-              {status === 'streaming' && streamingText && (
-                <>
-                  <span
-                    className={css({
-                      fontSize: 'xs',
-                      color: 'zinc.500',
-                      fontWeight: 'medium',
-                    })}
-                  >
-                    AI
-                  </span>
-                  <div className={cssMarkdown}>
-                    <ReactMarkdown>{streamingText}</ReactMarkdown>
-                  </div>
-                </>
-              )}
-
-              {messages.length === 0 && status !== 'streaming' && (
-                <p
-                  className={css({
-                    fontSize: 'sm',
-                    color: 'zinc.500',
-                    margin: 0,
-                    textAlign: 'center',
-                  })}
-                >
-                  Point your camera at something to analyze.
-                </p>
-              )}
-            </>
-          )}
-        </div>
-
-        <div slot="footer">
-          {topic && (
-            <div
-              className={css({
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                padding: '4px 8px',
-                backgroundColor: 'blue.500',
-                borderRadius: 'full',
-                fontSize: 'xs',
-                color: 'white',
-                margin: '4px 8px',
-                width: 'fit-content',
-              })}
-            >
-              <span>📌</span>
-              <span>{topic}</span>
-            </div>
-          )}
           <div
             className={css({
               display: 'flex',
@@ -460,6 +333,132 @@ export default function AiContentRenderer({
               </button>
             )}
           </div>
+          {topic && (
+            <div
+              className={css({
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                padding: '4px 8px',
+                backgroundColor: 'blue.500',
+                borderRadius: 'full',
+                fontSize: 'xs',
+                color: 'white',
+                margin: '0 8px 8px 8px',
+                width: 'fit-content',
+              })}
+            >
+              <span>📌</span>
+              <span>{topic}</span>
+            </div>
+          )}
+        </div>
+
+        <div
+          className={css({
+            padding: 4,
+            minHeight: '60px',
+          })}
+        >
+          {(status === 'waiting' || status === 'capturing') &&
+          messages.length === 0 &&
+          !streamingText ? (
+            <div
+              className={css({
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 2,
+                padding: 4,
+              })}
+            >
+              <div
+                className={css({
+                  width: '20px',
+                  height: '20px',
+                  border: '2px solid',
+                  borderColor: 'zinc.600',
+                  borderTopColor: 'blue.500',
+                  borderRadius: 'full',
+                  animation: 'spin 1s linear infinite',
+                })}
+              />
+              <p
+                className={css({
+                  fontSize: 'sm',
+                  color: 'zinc.400',
+                  margin: 0,
+                })}
+              >
+                {status === 'capturing' ? 'Capturing frame...' : 'Waiting to start...'}
+              </p>
+            </div>
+          ) : (
+            <>
+              {[...messages]
+                .reverse()
+                .slice(0, 10)
+                .map((msg, idx) => {
+                  const time = new Date(msg.timestamp).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                  });
+                  return (
+                    <div
+                      key={idx}
+                      className={css({
+                        marginBottom: 3,
+                      })}
+                    >
+                      <span
+                        className={css({
+                          fontSize: 'xs',
+                          color: 'zinc.500',
+                          fontWeight: 'medium',
+                        })}
+                      >
+                        {msg.role === 'user' ? 'You' : 'AI'} · {time}
+                      </span>
+                      <div className={cssMarkdownMessage}>
+                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      </div>
+                    </div>
+                  );
+                })}
+
+              {status === 'streaming' && streamingText && (
+                <>
+                  <span
+                    className={css({
+                      fontSize: 'xs',
+                      color: 'zinc.500',
+                      fontWeight: 'medium',
+                    })}
+                  >
+                    AI
+                  </span>
+                  <div className={cssMarkdown}>
+                    <ReactMarkdown>{streamingText}</ReactMarkdown>
+                  </div>
+                </>
+              )}
+
+              {messages.length === 0 && status !== 'streaming' && (
+                <p
+                  className={css({
+                    fontSize: 'sm',
+                    color: 'zinc.500',
+                    margin: 0,
+                    textAlign: 'center',
+                  })}
+                >
+                  Point your camera at something to analyze.
+                </p>
+              )}
+            </>
+          )}
         </div>
       </BottomSheet>
     </div>
