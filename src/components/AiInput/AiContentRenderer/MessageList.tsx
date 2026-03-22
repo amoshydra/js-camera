@@ -1,6 +1,6 @@
 import ReactMarkdown from 'react-markdown';
 import { css } from '~styled-system/css';
-import { cssMarkdown, cssMarkdownMessage } from './styles';
+import { cssMarkdownMessage } from './styles';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -18,6 +18,8 @@ export default function MessageList({ messages, streamingText, status }: Message
   const isLoading = status === 'waiting' || status === 'capturing';
   const showStreaming = status === 'streaming' && streamingText;
 
+  const hasMessages = messages.length > 0;
+
   return (
     <div
       className={css({
@@ -28,29 +30,36 @@ export default function MessageList({ messages, streamingText, status }: Message
       {isLoading && messages.length === 0 && !streamingText ? (
         <LoadingState status={status} />
       ) : (
-        <>
-          {messages
-            .slice(-10)
-            .reverse()
-            .map((msg, idx) => {
-              const time = new Date(msg.timestamp).toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-              });
-              return (
-                <MessageItem
-                  key={idx}
-                  msg={msg}
-                  time={time}
-                />
-              );
-            })}
-
+        <div
+          className={css({
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 3,
+          })}
+        >
           {showStreaming && <StreamingMessage streamingText={streamingText} />}
 
-          {messages.length === 0 && !showStreaming && <EmptyState />}
-        </>
+          {hasMessages &&
+            messages
+              .slice(-10)
+              .reverse()
+              .map((msg, idx) => {
+                const time = new Date(msg.timestamp).toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                });
+                return (
+                  <MessageItem
+                    key={idx}
+                    msg={msg}
+                    time={time}
+                  />
+                );
+              })}
+
+          {!showStreaming && !hasMessages && <EmptyState />}
+        </div>
       )}
     </div>
   );
@@ -117,7 +126,11 @@ function MessageItem({ msg, time }: { msg: Message; time: string }) {
 
 function StreamingMessage({ streamingText }: { streamingText: string }) {
   return (
-    <>
+    <div
+      className={css({
+        marginBottom: 3,
+      })}
+    >
       <span
         className={css({
           fontSize: 'xs',
@@ -127,10 +140,10 @@ function StreamingMessage({ streamingText }: { streamingText: string }) {
       >
         AI
       </span>
-      <div className={cssMarkdown}>
+      <div className={cssMarkdownMessage}>
         <ReactMarkdown>{streamingText}</ReactMarkdown>
       </div>
-    </>
+    </div>
   );
 }
 
