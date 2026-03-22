@@ -1,7 +1,7 @@
 import type { AiVisionState } from '../../hooks/useAiVision';
 import { BottomSheet } from 'pure-web-bottom-sheet/react';
 import { CSSProperties } from 'react';
-import { cx, css } from '~styled-system/css';
+import { css, cx } from '~styled-system/css';
 import AiHeader from './AiContentRenderer/AiHeader';
 import MessageList from './AiContentRenderer/MessageList';
 import StatusContent from './AiContentRenderer/StatusContent';
@@ -34,6 +34,7 @@ const bottomSheetBaseStyles = {
     boxSizing: 'border-box',
     background: 'rgba(22, 22, 22, 0.95)',
     backdropFilter: 'blur(8px)',
+    overscrollBehavior: 'contain',
   },
 };
 
@@ -71,11 +72,8 @@ export default function AiContentRenderer({
             css({
               ...bottomSheetBaseStyles,
               '&::part(content)': {
-                padding: 0,
+                ...bottomSheetBaseStyles['&::part(content)'],
                 paddingBottom: 'env(safe-area-inset-bottom)',
-                boxSizing: 'border-box',
-                background: 'rgba(22, 22, 22, 0.95)',
-                backdropFilter: 'blur(8px)',
               },
               '&::part(footer)': {
                 display: 'none',
@@ -113,6 +111,7 @@ export default function AiContentRenderer({
         key={showContent ? 'hasContent' : 'noContent'}
         tabIndex={0}
         content-height
+        nested-scroll
         style={
           {
             '--sheet-max-height': '50vh',
@@ -122,10 +121,7 @@ export default function AiContentRenderer({
           css({
             ...bottomSheetBaseStyles,
             '&::part(content)': {
-              padding: 0,
-              boxSizing: 'border-box',
-              background: 'rgba(22, 22, 22, 0.95)',
-              backdropFilter: 'blur(8px)',
+              ...bottomSheetBaseStyles['&::part(content)'],
               flex: '1',
               overflow: 'auto',
             },
