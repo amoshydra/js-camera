@@ -129,9 +129,14 @@ function resizeDataUrl(dataUrl: string, maxDimension: number): string {
   return canvas.toDataURL('image/jpeg', 0.8);
 }
 
+export interface UseAiVisionOptions {
+  promptModifier?: (basePrompt: string, context: { hasPrevious: boolean }) => string;
+}
+
 export function useAiVision(
   videoElement: HTMLVideoElement | null,
   isEnabled: boolean,
+  options?: UseAiVisionOptions,
 ): AiVisionState & { togglePause: () => void; askQuestion: (question: string) => void } {
   const [state, setState] = useState<AiVisionState>({
     status: 'idle',
@@ -145,6 +150,11 @@ export function useAiVision(
 
   const [configVersion, setConfigVersion] = useState(0);
   const isProcessingRef = useRef(false);
+  const promptModifierRef = useRef(options?.promptModifier);
+
+  useEffect(() => {
+    promptModifierRef.current = options?.promptModifier;
+  }, [options]);
   const abortControllerRef = useRef<AbortController | null>(null);
   const previousFrameRef = useRef<string | null>(null);
   const previousDescriptionRef = useRef<string | null>(null);
@@ -429,11 +439,16 @@ export function useAiVision(
       status: 'capturing',
     }));
 
+    const basePrompt = getNextPrompt(!!previousFrameRef.current);
+    const userPrompt = promptModifierRef.current
+      ? promptModifierRef.current(basePrompt, { hasPrevious: !!previousFrameRef.current })
+      : basePrompt;
+
     await sendMessage(
       frame.dataUrl,
       previousFrameRef.current,
       previousDescriptionRef.current,
-      getNextPrompt(!!previousFrameRef.current),
+      userPrompt,
       false,
     );
   }, [videoElement, isEnabled, sendMessage]);

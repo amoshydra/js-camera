@@ -7,7 +7,7 @@ import QrInput from '../components/QrInput/QrInput';
 import ContentRenderer from '../components/ContentRenderer/ContentRenderer';
 import AiContentRenderer from '../components/AiInput/AiContentRenderer';
 import AiSetupModal from '../components/AiInput/AiSetupModal';
-import { useAiVision } from '../hooks/useAiVision';
+import { useAiVisionTopic } from '../hooks/useAiVisionTopic';
 import { type Mode } from '../components/ModeToggle/ModeToggle';
 
 interface QrScannerProps {
@@ -38,7 +38,7 @@ export default function QrScanner({
 
   const isAiEnabled = mode === 'ai' && !disabled;
 
-  const { togglePause, askQuestion, ...aiState } = useAiVision(videoElement, isAiEnabled);
+  const { togglePause, setTopic, ...aiState } = useAiVisionTopic(videoElement, isAiEnabled);
 
   useEffect(() => {
     if (initialData?.data || initialData?.error) {
@@ -92,7 +92,7 @@ export default function QrScanner({
             onRetry={handleRetry}
             onOpenSettings={() => setShowAiSetupModal(true)}
             onPauseToggle={togglePause}
-            onAskQuestion={askQuestion}
+            onSetTopic={setTopic}
             className={cssBottom}
           />
         )}
