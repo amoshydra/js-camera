@@ -19,6 +19,7 @@ pnpm cssgen           # Generate CSS files
 pnpm test             # Run tests in watch mode
 pnpm test:run         # Run tests once (CI/pre-commit)
 pnpm test:ui          # Open Vitest UI
+pnpm preview          # Preview production build
 
 # Run a single test file or test case:
 pnpm vitest run src/lib/barcodeScanner.test.ts
@@ -140,13 +141,18 @@ src/
 │   └── ComponentName/
 │       ├── ComponentName.tsx
 │       └── ComponentName.test.tsx
-├── hooks/           # Custom React hooks
-├── lib/             # Utilities, libraries, business logic
-│   ├── errors.ts    # Error handling
-│   └── *.ts         # Other utilities
-├── test/            # Test setup files
+├── hooks/            # Custom React hooks
+├── lib/              # Utilities, libraries, business logic
+│   ├── errors.ts     # Error handling (ErrorCode enum, AppError class)
+│   └── *.ts          # Other utilities (e.g., barcodeScanner.ts)
+├── pages/            # Page components (e.g., QrScanner.tsx)
+├── experimental/     # Experimental features
+│   └── features/ai/  # AI Vision feature
+├── test/             # Test setup files
 │   └── setup.ts
-└── App.tsx          # Main app component
+├── App.tsx           # Main app component
+├── main.tsx          # Entry point
+└── sw.ts             # Service worker
 ```
 
 ### Git Workflow
