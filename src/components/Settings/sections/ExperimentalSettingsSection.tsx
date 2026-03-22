@@ -1,6 +1,9 @@
+import { lazy, Suspense } from 'react';
 import { css } from '~styled-system/css';
 import { settingsStore } from '../SettingsStore';
 import { useSettings } from '@/hooks/useSettings';
+
+const LazyAiSettingsSection = lazy(() => import('@/experimental/features/ai/AiSettingsSection'));
 
 export default function ExperimentalSettingsSection() {
   const settings = useSettings();
@@ -28,6 +31,14 @@ export default function ExperimentalSettingsSection() {
           <span className={settings.enableAiMode ? cssToggleKnobOn : cssToggleKnobOff} />
         </button>
       </div>
+
+      {settings.enableAiMode && (
+        <div className={cssAiSubsection}>
+          <Suspense fallback={null}>
+            <LazyAiSettingsSection />
+          </Suspense>
+        </div>
+      )}
     </section>
   );
 }
@@ -104,4 +115,10 @@ const cssToggleKnobOn = css({
   backgroundColor: 'white',
   borderRadius: '50%',
   transition: 'transform 0.2s ease',
+});
+
+const cssAiSubsection = css({
+  marginTop: '0.5rem',
+  paddingLeft: '1rem',
+  borderLeft: '2px solid rgba(59, 130, 246, 0.3)',
 });

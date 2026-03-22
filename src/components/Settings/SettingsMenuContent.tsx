@@ -1,14 +1,10 @@
 import { css } from '~styled-system/css';
 import { VideoStreamConstrain } from '@/components/QrInput/ConfigurationStorage';
 import { CloseIcon } from '@/components/QrInput/Icons';
-import { lazy, Suspense } from 'react';
-import { useSettings } from '@/hooks/useSettings';
 import ScannerSettingsSection from './sections/ScannerSettingsSection';
 import CameraSettingsSection from './sections/CameraSettingsSection';
 import ExperimentalSettingsSection from './sections/ExperimentalSettingsSection';
 import SettingsFooter from './SettingsFooter';
-
-const LazyAiSettingsSection = lazy(() => import('@/experimental/features/ai/AiSettingsSection'));
 
 interface SettingsMenuContentProps {
   className?: string;
@@ -23,8 +19,6 @@ export default function SettingsMenuContent({
   onCameraValueChange,
   onClose,
 }: SettingsMenuContentProps) {
-  const settings = useSettings();
-
   return (
     <div className={`${cssWrapper} ${className || ''}`}>
       <button
@@ -40,23 +34,14 @@ export default function SettingsMenuContent({
 
         <div className={cssDivider} />
 
-        <ExperimentalSettingsSection />
-
-        <div className={cssDivider} />
-
         <CameraSettingsSection
           value={cameraValue}
           onUpdateModelValue={onCameraValueChange}
         />
 
-        {settings.enableAiMode && (
-          <>
-            <div className={cssDivider} />
-            <Suspense fallback={null}>
-              <LazyAiSettingsSection />
-            </Suspense>
-          </>
-        )}
+        <div className={cssDivider} />
+
+        <ExperimentalSettingsSection />
 
         <SettingsFooter />
       </div>
