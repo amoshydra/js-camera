@@ -1,11 +1,11 @@
 import { type QrReaderData } from '@/lib/barcodeScanner';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { css, cx } from '~styled-system/css';
 import CameraFeed from './CameraFeed';
 import QrReader from './QrReader';
-import { useCameraStreamReceiver } from './CameraStreamReceiver.hook';
+import { useCameraStreamReceiver, type VideoSourceType } from './CameraStreamReceiver.hook';
 import SettingsMenu from '../Settings/SettingsMenu';
-import { configStore } from './CameraStreamConfigurator.lib';
+import { configStore, extractOrGetFirst } from './CameraStreamConfigurator.lib';
 import ModeToggle, { type Mode } from '../ModeToggle/ModeToggle';
 
 interface QrInputProps {
@@ -17,6 +17,18 @@ interface QrInputProps {
   onVideoElement?: (element: HTMLVideoElement | null) => void;
   enableAiMode?: boolean;
 }
+
+const getSourceType = (constraints: ReturnType<typeof configStore.load>): VideoSourceType => {
+  if (typeof constraints !== 'object' || constraints === null) return 'camera';
+
+  const deviceId = extractOrGetFirst((constraints as MediaTrackConstraints).deviceId);
+
+  if (typeof deviceId === 'string' && deviceId === 'screen') {
+    return 'screen';
+  }
+
+  return 'camera';
+};
 
 export default function QrInput({
   disabled = false,
@@ -31,11 +43,13 @@ export default function QrInput({
     null,
   );
 
+  const videoStreamConstraints = useMemo(() => configStore.load(), []);
+  const sourceType = getSourceType(videoStreamConstraints);
+
   const {
     stream,
     loading,
     error,
-    videoStreamConstraints,
     onVideoStreamContrainsChange,
     torchEnabled,
     zoomLevel,
@@ -43,7 +57,9 @@ export default function QrInput({
     applyTorch,
     applyZoom,
     flipCamera,
-  } = useCameraStreamReceiver(disabled);
+    screenCaptureEnded,
+    retryScreenCapture,
+  } = useCameraStreamReceiver(disabled, sourceType);
 
   const updateConfig = (config: typeof videoStreamConstraints) => {
     configStore.store(config);
@@ -83,6 +99,9 @@ export default function QrInput({
         applyTorch={applyTorch}
         applyZoom={applyZoom}
         flipCamera={flipCamera}
+        sourceType={sourceType}
+        screenCaptureEnded={screenCaptureEnded}
+        onRetryScreenCapture={retryScreenCapture}
       />
       {mode === 'qr' && (
         <QrReader

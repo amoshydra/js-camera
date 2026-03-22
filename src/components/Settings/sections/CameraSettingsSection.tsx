@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { css } from '~styled-system/css';
 import { VideoStreamConstrain } from '@/components/QrInput/ConfigurationStorage';
 import { extractOrGetFirst } from '@/components/QrInput/CameraStreamConfigurator.lib';
+import { isScreenCaptureSupported } from '@/lib/screenCapture';
+
+const SCREEN_CAPTURE_DEVICE_ID = 'screen';
 
 interface CameraSettingsSectionProps {
   value: VideoStreamConstrain;
@@ -33,6 +36,8 @@ export default function CameraSettingsSection({
 }: CameraSettingsSectionProps) {
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const selectedDeviceId = extractConfig(value as VideoStreamConstrain, 'deviceId');
+  const screenCaptureSupported = isScreenCaptureSupported();
+  const isScreenSelected = selectedDeviceId === SCREEN_CAPTURE_DEVICE_ID;
 
   useEffect(() => {
     navigator.mediaDevices.enumerateDevices().then((deviceList) => {
@@ -41,10 +46,16 @@ export default function CameraSettingsSection({
   }, []);
 
   const handleInput = (deviceId: string) => {
-    onUpdateModelValue?.({
-      ...(value as object),
-      deviceId,
-    } as VideoStreamConstrain);
+    if (deviceId === SCREEN_CAPTURE_DEVICE_ID) {
+      onUpdateModelValue?.({
+        deviceId: SCREEN_CAPTURE_DEVICE_ID,
+      } as VideoStreamConstrain);
+    } else {
+      onUpdateModelValue?.({
+        ...(value as object),
+        deviceId,
+      } as VideoStreamConstrain);
+    }
   };
 
   return (
@@ -57,10 +68,19 @@ export default function CameraSettingsSection({
           className={cssInput}
           onChange={(e) => handleInput(e.target.value)}
         >
+          {screenCaptureSupported && (
+            <option
+              key="screen"
+              value={SCREEN_CAPTURE_DEVICE_ID}
+              selected={isScreenSelected}
+            >
+              Screen
+            </option>
+          )}
           <option
             key="default"
             value=""
-            selected={!selectedDeviceId}
+            selected={!selectedDeviceId && !isScreenSelected}
           >
             Default camera
           </option>
