@@ -1,8 +1,10 @@
 import type { AiVisionState } from '@/hooks/useAiVision';
 import { BottomSheet } from 'pure-web-bottom-sheet/react';
-import { CSSProperties, useState } from 'react';
-import ReactMarkdown from 'react-markdown';
-import { css, cx } from '~styled-system/css';
+import { CSSProperties } from 'react';
+import { cx, css } from '~styled-system/css';
+import AiHeader from './AiContentRenderer/AiHeader';
+import MessageList from './AiContentRenderer/MessageList';
+import StatusContent from './AiContentRenderer/StatusContent';
 
 interface AiContentRendererProps {
   state: AiVisionState & { topic?: string | null };
@@ -13,6 +15,28 @@ interface AiContentRendererProps {
   className?: string;
 }
 
+const bottomSheetBaseStyles = {
+  '&::part(sheet)': {
+    background: 'none',
+    boxSizing: 'border-box',
+  },
+  '&::part(handle)': {
+    background: 'rgba(255, 255, 255, 0.15)',
+  },
+  '&::part(header)': {
+    boxSizing: 'border-box',
+    background: 'rgba(22, 22, 22, 0.95)',
+    backdropFilter: 'blur(8px)',
+    zIndex: 1,
+  },
+  '&::part(content)': {
+    padding: 0,
+    boxSizing: 'border-box',
+    background: 'rgba(22, 22, 22, 0.95)',
+    backdropFilter: 'blur(8px)',
+  },
+};
+
 export default function AiContentRenderer({
   state,
   onRetry,
@@ -22,25 +46,9 @@ export default function AiContentRenderer({
   className,
 }: AiContentRendererProps) {
   const { status, streamingText, lastError, isPaused, messages, topic } = state;
-  const [topicInput, setTopicInput] = useState('');
 
   const isProcessing = status === 'capturing' || status === 'streaming';
 
-  const handleSubmitTopic = () => {
-    if (topicInput.trim() && onSetTopic) {
-      onSetTopic(topicInput.trim());
-      setTopicInput('');
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmitTopic();
-    }
-  };
-
-  // Only show setup/error screens when there are no messages at all
   const hasMessages = messages.length > 0;
 
   if (
@@ -61,19 +69,7 @@ export default function AiContentRenderer({
           }
           className={cx(
             css({
-              '&::part(sheet)': {
-                background: 'none',
-                boxSizing: 'border-box',
-              },
-              '&::part(handle)': {
-                background: 'rgba(255, 255, 255, 0.15)',
-              },
-              '&::part(header)': {
-                boxSizing: 'border-box',
-                background: 'rgba(22, 22, 22, 0.95)',
-                backdropFilter: 'blur(8px)',
-                zIndex: 1,
-              },
+              ...bottomSheetBaseStyles,
               '&::part(content)': {
                 padding: 0,
                 paddingBottom: 'env(safe-area-inset-bottom)',
@@ -124,19 +120,7 @@ export default function AiContentRenderer({
         }
         className={cx(
           css({
-            '&::part(sheet)': {
-              background: 'none',
-              boxSizing: 'border-box',
-            },
-            '&::part(handle)': {
-              background: 'rgba(255, 255, 255, 0.15)',
-            },
-            '&::part(header)': {
-              boxSizing: 'border-box',
-              background: 'rgba(22, 22, 22, 0.95)',
-              backdropFilter: 'blur(8px)',
-              zIndex: 1,
-            },
+            ...bottomSheetBaseStyles,
             '&::part(content)': {
               padding: 0,
               boxSizing: 'border-box',
@@ -170,711 +154,21 @@ export default function AiContentRenderer({
         )}
 
         <div slot="header">
-          <div
-            className={css({
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 2,
-              width: 'full',
-              px: 4,
-              py: 2,
-              pt: 0,
-            })}
-          >
-            <div
-              className={css({
-                display: 'flex',
-                alignItems: 'center',
-                gap: 2,
-              })}
-            >
-              <span
-                className={css({
-                  fontSize: 'sm',
-                  fontWeight: 'semibold',
-                  color: 'zinc.300',
-                })}
-              >
-                AI Vision
-              </span>
-              {isProcessing && (
-                <span
-                  className={css({
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    fontSize: 'xs',
-                    color: 'blue.400',
-                  })}
-                >
-                  <span
-                    className={css({
-                      width: '6px',
-                      height: '6px',
-                      borderRadius: 'full',
-                      backgroundColor: 'blue.500',
-                      animation: 'pulse 1.5s ease-in-out infinite',
-                    })}
-                  />
-                  Analyzing...
-                </span>
-              )}
-              {isPaused && !isProcessing && (
-                <span
-                  className={css({
-                    fontSize: 'xs',
-                    color: 'zinc.400',
-                  })}
-                >
-                  Paused
-                </span>
-              )}
-            </div>
-            <button
-              className={css({
-                padding: '6px',
-                borderRadius: 'md',
-                border: '1px solid',
-                borderColor: 'zinc.700',
-                backgroundColor: 'zinc.800',
-                color: 'zinc.300',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                '&:hover': {
-                  backgroundColor: 'zinc.700',
-                  color: 'white',
-                },
-              })}
-              onClick={onPauseToggle}
-              aria-label={isPaused ? 'Resume' : 'Pause'}
-            >
-              {isPaused ? <PlayIcon /> : <PauseIcon />}
-            </button>
-          </div>
-          <div
-            className={css({
-              display: 'flex',
-              gap: 2,
-              padding: 2,
-              paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)',
-            })}
-          >
-            <input
-              type="text"
-              className={css({
-                flex: 1,
-                padding: '8px 12px',
-                fontSize: 'sm',
-                backgroundColor: 'zinc.800',
-                border: '1px solid',
-                borderColor: 'zinc.700',
-                borderRadius: 'md',
-                color: 'white',
-                '&:focus': {
-                  outline: 'none',
-                  borderColor: 'blue.500',
-                },
-                '&::placeholder': {
-                  color: 'zinc.500',
-                },
-                '&:disabled': {
-                  opacity: 0.5,
-                  cursor: 'not-allowed',
-                },
-              })}
-              placeholder={topic ? 'Update topic...' : 'Set a topic to focus...'}
-              value={topicInput}
-              onChange={(e) => setTopicInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
-            <button
-              className={css({
-                padding: '8px 16px',
-                fontSize: 'sm',
-                backgroundColor: 'blue.500',
-                border: 'none',
-                borderRadius: 'md',
-                color: 'white',
-                cursor: 'pointer',
-                '&:hover:not(:disabled)': {
-                  backgroundColor: 'blue.400',
-                },
-                '&:disabled': {
-                  opacity: 0.5,
-                  cursor: 'not-allowed',
-                },
-              })}
-              onClick={handleSubmitTopic}
-              disabled={!topicInput.trim()}
-            >
-              {topic ? 'Update' : 'Set'}
-            </button>
-            {topic && (
-              <button
-                className={css({
-                  padding: '8px 12px',
-                  fontSize: 'sm',
-                  backgroundColor: 'zinc.700',
-                  border: 'none',
-                  borderRadius: 'md',
-                  color: 'zinc.300',
-                  cursor: 'pointer',
-                  '&:hover': {
-                    backgroundColor: 'zinc.600',
-                    color: 'white',
-                  },
-                })}
-                onClick={() => onSetTopic?.(null)}
-              >
-                Clear
-              </button>
-            )}
-          </div>
-          {topic && (
-            <div
-              className={css({
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                padding: '4px 8px',
-                backgroundColor: 'blue.500',
-                borderRadius: 'full',
-                fontSize: 'xs',
-                color: 'white',
-                margin: '0 8px 8px 8px',
-                width: 'fit-content',
-              })}
-            >
-              <span>📌</span>
-              <span>{topic}</span>
-            </div>
-          )}
+          <AiHeader
+            isPaused={isPaused}
+            isProcessing={isProcessing}
+            topic={topic}
+            onPauseToggle={onPauseToggle}
+            onSetTopic={onSetTopic}
+          />
         </div>
 
-        <div
-          className={css({
-            padding: 4,
-            minHeight: '60px',
-          })}
-        >
-          {(status === 'waiting' || status === 'capturing') &&
-          messages.length === 0 &&
-          !streamingText ? (
-            <div
-              className={css({
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 2,
-                padding: 4,
-              })}
-            >
-              <div
-                className={css({
-                  width: '20px',
-                  height: '20px',
-                  border: '2px solid',
-                  borderColor: 'zinc.600',
-                  borderTopColor: 'blue.500',
-                  borderRadius: 'full',
-                  animation: 'spin 1s linear infinite',
-                })}
-              />
-              <p
-                className={css({
-                  fontSize: 'sm',
-                  color: 'zinc.400',
-                  margin: 0,
-                })}
-              >
-                {status === 'capturing' ? 'Capturing frame...' : 'Waiting to start...'}
-              </p>
-            </div>
-          ) : (
-            <>
-              {[...messages]
-                .reverse()
-                .slice(0, 10)
-                .map((msg, idx) => {
-                  const time = new Date(msg.timestamp).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                  });
-                  return (
-                    <div
-                      key={idx}
-                      className={css({
-                        marginBottom: 3,
-                      })}
-                    >
-                      <span
-                        className={css({
-                          fontSize: 'xs',
-                          color: 'zinc.500',
-                          fontWeight: 'medium',
-                        })}
-                      >
-                        {msg.role === 'user' ? 'You' : 'AI'} · {time}
-                      </span>
-                      <div className={cssMarkdownMessage}>
-                        <ReactMarkdown>{msg.content}</ReactMarkdown>
-                      </div>
-                    </div>
-                  );
-                })}
-
-              {status === 'streaming' && streamingText && (
-                <>
-                  <span
-                    className={css({
-                      fontSize: 'xs',
-                      color: 'zinc.500',
-                      fontWeight: 'medium',
-                    })}
-                  >
-                    AI
-                  </span>
-                  <div className={cssMarkdown}>
-                    <ReactMarkdown>{streamingText}</ReactMarkdown>
-                  </div>
-                </>
-              )}
-
-              {messages.length === 0 && status !== 'streaming' && (
-                <p
-                  className={css({
-                    fontSize: 'sm',
-                    color: 'zinc.500',
-                    margin: 0,
-                    textAlign: 'center',
-                  })}
-                >
-                  Point your camera at something to analyze.
-                </p>
-              )}
-            </>
-          )}
-        </div>
+        <MessageList
+          messages={messages}
+          streamingText={streamingText}
+          status={status}
+        />
       </BottomSheet>
     </div>
   );
 }
-
-function StatusContent({
-  status,
-  lastError,
-  onRetry,
-  onOpenSettings,
-}: {
-  status: string;
-  lastError: { message: string } | null;
-  onRetry?: () => void;
-  onOpenSettings?: () => void;
-}) {
-  if (status === 'connecting') {
-    return (
-      <div
-        className={css({
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 4,
-          padding: 8,
-        })}
-      >
-        <div
-          className={css({
-            width: '20px',
-            height: '20px',
-            border: '2px solid',
-            borderColor: 'zinc.600',
-            borderTopColor: 'blue.500',
-            borderRadius: 'full',
-            animation: 'spin 1s linear infinite',
-          })}
-        />
-        <p
-          className={css({
-            fontSize: 'sm',
-            color: 'zinc.400',
-            margin: 0,
-          })}
-        >
-          Setting up AI Vision...
-        </p>
-      </div>
-    );
-  }
-
-  if (status === 'idle' && lastError) {
-    return (
-      <div
-        className={css({
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 3,
-          padding: 6,
-        })}
-      >
-        <div
-          className={css({
-            fontSize: '24px',
-          })}
-        >
-          ⚙️
-        </div>
-        <h3
-          className={css({
-            fontSize: 'lg',
-            fontWeight: 'semibold',
-            color: 'white',
-            margin: 0,
-          })}
-        >
-          AI Not Configured
-        </h3>
-        <p
-          className={css({
-            fontSize: 'sm',
-            color: 'zinc.300',
-            margin: 0,
-            textAlign: 'center',
-          })}
-        >
-          Configure your API settings to enable AI-powered vision analysis.
-        </p>
-        <div
-          className={css({
-            display: 'flex',
-            gap: 3,
-            marginTop: 2,
-          })}
-        >
-          <button
-            className={css({
-              padding: '8px 16px',
-              borderRadius: 'md',
-              border: 'none',
-              backgroundColor: 'blue.500',
-              color: 'white',
-              fontSize: 'sm',
-              fontWeight: 'medium',
-              cursor: 'pointer',
-              '&:hover': {
-                backgroundColor: 'blue.400',
-              },
-            })}
-            onClick={onOpenSettings}
-          >
-            Configure AI
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (status === 'idle') {
-    return (
-      <div
-        className={css({
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 4,
-          padding: 8,
-        })}
-      >
-        <p
-          className={css({
-            fontSize: 'lg',
-            fontWeight: 'semibold',
-            color: 'white',
-            margin: 0,
-          })}
-        >
-          AI Vision
-        </p>
-        <p
-          className={css({
-            fontSize: 'sm',
-            color: 'zinc.400',
-            margin: 0,
-            textAlign: 'center',
-          })}
-        >
-          Configure your API settings to enable AI-powered image analysis.
-        </p>
-        <button
-          className={css({
-            padding: '10px 20px',
-            borderRadius: 'md',
-            border: 'none',
-            backgroundColor: 'blue.500',
-            color: 'white',
-            fontSize: 'sm',
-            fontWeight: 'medium',
-            cursor: 'pointer',
-            '&:hover': {
-              backgroundColor: 'blue.400',
-            },
-          })}
-          onClick={onOpenSettings}
-        >
-          Configure AI
-        </button>
-      </div>
-    );
-  }
-
-  if (status === 'error' && lastError) {
-    return (
-      <div
-        className={css({
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 3,
-          padding: 6,
-        })}
-      >
-        <div
-          className={css({
-            fontSize: '24px',
-          })}
-        >
-          ⚠️
-        </div>
-        <h3
-          className={css({
-            fontSize: 'lg',
-            fontWeight: 'semibold',
-            color: 'white',
-            margin: 0,
-          })}
-        >
-          AI Vision Error
-        </h3>
-        <p
-          className={css({
-            fontSize: 'sm',
-            color: 'zinc.300',
-            margin: 0,
-            textAlign: 'center',
-          })}
-        >
-          {lastError.message}
-        </p>
-        <div
-          className={css({
-            display: 'flex',
-            gap: 3,
-            marginTop: 2,
-          })}
-        >
-          <button
-            className={css({
-              padding: '8px 16px',
-              borderRadius: 'md',
-              border: 'none',
-              backgroundColor: 'blue.500',
-              color: 'white',
-              fontSize: 'sm',
-              fontWeight: 'medium',
-              cursor: 'pointer',
-              '&:hover': {
-                backgroundColor: 'blue.400',
-              },
-            })}
-            onClick={onRetry}
-          >
-            Retry
-          </button>
-          <button
-            className={css({
-              padding: '8px 16px',
-              borderRadius: 'md',
-              border: '1px solid',
-              borderColor: 'zinc.600',
-              backgroundColor: 'transparent',
-              color: 'zinc.300',
-              fontSize: 'sm',
-              cursor: 'pointer',
-              '&:hover': {
-                backgroundColor: 'zinc.800',
-                color: 'white',
-              },
-            })}
-            onClick={onOpenSettings}
-          >
-            Settings
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return null;
-}
-
-const PauseIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="currentColor"
-  >
-    <rect
-      x="6"
-      y="4"
-      width="4"
-      height="16"
-      rx="1"
-    />
-    <rect
-      x="14"
-      y="4"
-      width="4"
-      height="16"
-      rx="1"
-    />
-  </svg>
-);
-
-const PlayIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="currentColor"
-  >
-    <path d="M8 5v14l11-7z" />
-  </svg>
-);
-
-const cssMarkdown = css({
-  fontSize: 'sm',
-  color: 'white',
-  lineHeight: '1.6',
-  '& p': {
-    margin: '0 0 8px 0',
-    '&:last-child': {
-      marginBottom: 0,
-    },
-  },
-  '& strong': {
-    fontWeight: 'semibold',
-    color: 'white',
-  },
-  '& em': {
-    fontStyle: 'italic',
-    color: 'zinc.300',
-  },
-  '& code': {
-    fontSize: 'xs',
-    backgroundColor: 'zinc.800',
-    padding: '2px 4px',
-    borderRadius: 'sm',
-    fontFamily: 'monospace',
-  },
-  '& pre': {
-    backgroundColor: 'zinc.800',
-    padding: 3,
-    borderRadius: 'md',
-    overflow: 'auto',
-    margin: '8px 0',
-    '& code': {
-      backgroundColor: 'transparent',
-      padding: 0,
-    },
-  },
-  '& ul, & ol': {
-    margin: '8px 0',
-    paddingLeft: 5,
-  },
-  '& li': {
-    marginBottom: 1,
-  },
-  '& h1, & h2, & h3, & h4': {
-    fontWeight: 'semibold',
-    marginBottom: 2,
-    marginTop: 3,
-    color: 'white',
-  },
-  '& h1': { fontSize: 'lg' },
-  '& h2': { fontSize: 'base' },
-  '& h3': { fontSize: 'sm' },
-  '& h4': { fontSize: 'xs' },
-  '& a': {
-    color: 'blue.400',
-    textDecoration: 'underline',
-    '&:hover': {
-      color: 'blue.300',
-    },
-  },
-  '& blockquote': {
-    borderLeft: '2px solid',
-    borderColor: 'zinc.600',
-    paddingLeft: 3,
-    margin: '8px 0',
-    color: 'zinc.400',
-    fontStyle: 'italic',
-  },
-});
-
-const cssMarkdownMessage = css({
-  fontSize: 'sm',
-  color: 'zinc.200',
-  lineHeight: '1.5',
-  margin: '2px 0 0 0',
-  '& p': {
-    margin: '0 0 4px 0',
-    '&:last-child': {
-      marginBottom: 0,
-    },
-  },
-  '& strong': {
-    fontWeight: 'semibold',
-    color: 'white',
-  },
-  '& em': {
-    fontStyle: 'italic',
-    color: 'zinc.300',
-  },
-  '& code': {
-    fontSize: 'xs',
-    backgroundColor: 'zinc.800',
-    padding: '2px 4px',
-    borderRadius: 'sm',
-    fontFamily: 'monospace',
-  },
-  '& pre': {
-    backgroundColor: 'zinc.800',
-    padding: 2,
-    borderRadius: 'md',
-    overflow: 'auto',
-    margin: '4px 0',
-    '& code': {
-      backgroundColor: 'transparent',
-      padding: 0,
-    },
-  },
-  '& ul, & ol': {
-    margin: '4px 0',
-    paddingLeft: 4,
-  },
-  '& li': {
-    marginBottom: 1,
-  },
-  '& a': {
-    color: 'blue.400',
-    textDecoration: 'underline',
-  },
-});
