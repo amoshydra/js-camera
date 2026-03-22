@@ -1,14 +1,12 @@
-import { useState } from 'react';
 import { css } from '~styled-system/css';
 import { settingsStore } from '../SettingsStore';
+import { useSettings } from '@/hooks/useSettings';
 
 export default function ExperimentalSettingsSection() {
-  const [enableAiMode, setEnableAiMode] = useState(() => settingsStore.settings.enableAiMode);
+  const settings = useSettings();
 
   const handleToggle = () => {
-    const newValue = !settingsStore.settings.enableAiMode;
-    setEnableAiMode(newValue);
-    settingsStore.setEnableAiMode(newValue);
+    settingsStore.setEnableAiMode(!settings.enableAiMode);
   };
 
   return (
@@ -24,10 +22,10 @@ export default function ExperimentalSettingsSection() {
           type="button"
           className={cssToggle}
           onClick={handleToggle}
-          aria-pressed={enableAiMode}
-          aria-label={enableAiMode ? 'Disable AI Vision' : 'Enable AI Vision'}
+          aria-pressed={settings.enableAiMode}
+          aria-label={settings.enableAiMode ? 'Disable AI Vision' : 'Enable AI Vision'}
         >
-          <span className={enableAiMode ? cssToggleKnobOn : cssToggleKnobOff} />
+          <span className={settings.enableAiMode ? cssToggleKnobOn : cssToggleKnobOff} />
         </button>
       </div>
     </section>
