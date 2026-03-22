@@ -1,5 +1,8 @@
 /// <reference lib="webworker" />
 import { openDB, storeFile } from '@/lib/idb';
+
+const BUILD_SHA = import.meta.env.VITE_GIT_SHA;
+console.log('[SW] Build SHA:', BUILD_SHA);
 import { precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { CacheFirst } from 'workbox-strategies';
