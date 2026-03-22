@@ -1,8 +1,8 @@
-import { aiConfigStore, type AIConfig } from '@/lib/aiConfigStore';
-import { OpenAIClient } from '@/lib/openaiClient';
+import { aiConfigStore, type AIConfig } from '../../lib/aiConfigStore';
+import { OpenAIClient } from '../../lib/openaiClient';
 import { useState } from 'react';
 import { css, cx } from '~styled-system/css';
-import Dialog from '../Dialog/Dialog';
+import Dialog from '@/components/Dialog/Dialog';
 
 interface AiSetupModalProps {
   open: boolean;

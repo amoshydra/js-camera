@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { css, cx } from '~styled-system/css';
-import { aiConfigStore } from '@/lib/aiConfigStore';
+import { aiConfigStore } from '../../lib/aiConfigStore';
 import AiSetupModal from './AiSetupModal';
 
 interface AiInputProps {

@@ -23,19 +23,6 @@ export default defineConfig({
       registerType: 'prompt',
       workbox: {
         globPatterns: ['**/*.{js,css,png,wasm,woff2,html}'],
-        runtimeCaching: [
-          {
-            urlPattern: /\.(?:wasm)$/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'wasm-cache',
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365,
-              },
-            },
-          },
-        ],
       },
       manifest: {
         name: 'QR Camera',
@@ -84,6 +71,26 @@ export default defineConfig({
     },
   },
   base,
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          if (id.includes('/experimental/')) {
+            return 'experimental';
+          }
+          if (id.includes('/node_modules/')) {
+            if (id.includes('react-markdown')) {
+              return 'vendor-markdown';
+            }
+            if (id.includes('pure-web-bottom-sheet')) {
+              return 'vendor-bottom-sheet';
+            }
+            return 'vendor';
+          }
+        },
+      },
+    },
+  },
   server: {
     host: true,
     allowedHosts: true,

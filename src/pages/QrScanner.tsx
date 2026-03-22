@@ -6,7 +6,7 @@ import QrInput from '../components/QrInput/QrInput';
 import ContentRenderer from '../components/ContentRenderer/ContentRenderer';
 import { type Mode } from '../components/ModeToggle/ModeToggle';
 
-const AiView = lazy(() => import('./AiView'));
+const AiView = lazy(() => import('@/experimental/features/ai/AiView'));
 
 interface QrScannerProps {
   disabled?: boolean;

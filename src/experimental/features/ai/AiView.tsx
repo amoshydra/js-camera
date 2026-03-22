@@ -1,7 +1,7 @@
-import AiContentRenderer from '@/components/AiInput/AiContentRenderer';
-import AiSetupModal from '@/components/AiInput/AiSetupModal';
-import { useAiVisionTopic } from '@/hooks/useAiVisionTopic';
-import { aiConfigStore } from '@/lib/aiConfigStore';
+import AiContentRenderer from './components/AiInput/AiContentRenderer';
+import AiSetupModal from './components/AiInput/AiSetupModal';
+import { useAiVisionTopic } from './hooks/useAiVisionTopic';
+import { aiConfigStore } from './lib/aiConfigStore';
 import { useEffect, useRef, useState } from 'react';
 import { css } from '~styled-system/css';
 

@@ -1,10 +1,44 @@
 /// <reference lib="webworker" />
 import { openDB, storeFile } from '@/lib/idb';
+import { precacheAndRoute } from 'workbox-precaching';
+import { registerRoute } from 'workbox-routing';
+import { CacheFirst } from 'workbox-strategies';
+import { ExpirationPlugin } from 'workbox-expiration';
 
-const sw = self as unknown as ServiceWorkerGlobalScope;
+declare const self: ServiceWorkerGlobalScope;
+const sw = self;
 
-// Workbox manifest injection placeholder - workbox-build replaces this with precache manifest
-void (self as unknown as Record<string, unknown>).__WB_MANIFEST;
+type WBManifestEntry = { url: string; revision: string | null };
+const filteredManifest = (
+  self as unknown as { __WB_MANIFEST: WBManifestEntry[] }
+).__WB_MANIFEST.filter((entry) => !entry.url.includes('/experimental'));
+precacheAndRoute(filteredManifest);
+
+registerRoute(
+  /\.(?:wasm)$/i,
+  new CacheFirst({
+    cacheName: 'wasm-cache',
+    plugins: [
+      new ExpirationPlugin({
+        maxEntries: 10,
+        maxAgeSeconds: 60 * 60 * 24 * 365,
+      }),
+    ],
+  }),
+);
+
+registerRoute(
+  /\/assets\/experimental-.*\.js$/,
+  new CacheFirst({
+    cacheName: 'experimental-cache',
+    plugins: [
+      new ExpirationPlugin({
+        maxEntries: 1,
+        maxAgeSeconds: 60 * 60 * 24 * 365,
+      }),
+    ],
+  }),
+);
 
 sw.addEventListener('install', () => sw.skipWaiting());
 sw.addEventListener('activate', () => sw.clients.claim());

@@ -6,7 +6,7 @@ export default function ExperimentalSettingsSection() {
   const [enableAiMode, setEnableAiMode] = useState(() => settingsStore.settings.enableAiMode);
 
   const handleToggle = () => {
-    const newValue = !enableAiMode;
+    const newValue = !settingsStore.settings.enableAiMode;
     setEnableAiMode(newValue);
     settingsStore.setEnableAiMode(newValue);
   };

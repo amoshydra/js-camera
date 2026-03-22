@@ -1,4 +1,4 @@
-import { aiConfigStore, DEFAULT_SYSTEM_PROMPT } from '@/lib/aiConfigStore';
+import { aiConfigStore, DEFAULT_SYSTEM_PROMPT } from '../lib/aiConfigStore';
 import { AppError, ErrorCode } from '@/lib/errors';
 import { captureFrame } from '@/lib/frameCapture';
 import { useCallback, useEffect, useRef, useState } from 'react';

@@ -1,4 +1,4 @@
-import type { AiVisionState } from '@/hooks/useAiVision';
+import type { AiVisionState } from '../../hooks/useAiVision';
 import { BottomSheet } from 'pure-web-bottom-sheet/react';
 import { CSSProperties } from 'react';
 import { cx, css } from '~styled-system/css';

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { css } from '~styled-system/css';
-import { aiConfigStore, getDefaultAIConfig, type AIConfig } from '@/lib/aiConfigStore';
-import { OpenAIClient } from '@/lib/openaiClient';
+import { aiConfigStore, getDefaultAIConfig, type AIConfig } from './lib/aiConfigStore';
+import { OpenAIClient } from './lib/openaiClient';
 
 export default function AiSettingsSection() {
   const [config, setConfig] = useState<AIConfig>(() => aiConfigStore.load());

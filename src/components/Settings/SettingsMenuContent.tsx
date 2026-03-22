@@ -2,12 +2,13 @@ import { css } from '~styled-system/css';
 import { VideoStreamConstrain } from '@/components/QrInput/ConfigurationStorage';
 import { CloseIcon } from '@/components/QrInput/Icons';
 import { settingsStore } from './SettingsStore';
-import { useState, useEffect } from 'react';
+import { lazy, Suspense, useState, useEffect, useRef } from 'react';
 import ScannerSettingsSection from './sections/ScannerSettingsSection';
 import CameraSettingsSection from './sections/CameraSettingsSection';
-import AiSettingsSection from './sections/AiSettingsSection';
 import ExperimentalSettingsSection from './sections/ExperimentalSettingsSection';
 import SettingsFooter from './SettingsFooter';
+
+const LazyAiSettingsSection = lazy(() => import('@/experimental/features/ai/AiSettingsSection'));
 
 interface SettingsMenuContentProps {
   className?: string;
@@ -23,10 +24,12 @@ export default function SettingsMenuContent({
   onClose,
 }: SettingsMenuContentProps) {
   const [enableAiMode, setEnableAiMode] = useState(() => settingsStore.settings.enableAiMode);
+  const setEnableAiModeRef = useRef(setEnableAiMode);
+  setEnableAiModeRef.current = setEnableAiMode;
 
   useEffect(() => {
     const handleSettingsChange = () => {
-      setEnableAiMode(settingsStore.settings.enableAiMode);
+      setEnableAiModeRef.current(settingsStore.settings.enableAiMode);
     };
     window.addEventListener('js-camera-settings-change', handleSettingsChange);
     return () => window.removeEventListener('js-camera-settings-change', handleSettingsChange);
@@ -59,7 +62,9 @@ export default function SettingsMenuContent({
         {enableAiMode && (
           <>
             <div className={cssDivider} />
-            <AiSettingsSection />
+            <Suspense fallback={null}>
+              <LazyAiSettingsSection />
+            </Suspense>
           </>
         )}
 
