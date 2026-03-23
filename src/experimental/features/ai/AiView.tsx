@@ -17,7 +17,10 @@ export default function AiView({ videoElement, disabled, onOpenSettings }: AiVie
 
   const isAiEnabled = !disabled;
 
-  const { togglePause, setTopic, ...aiState } = useAiVisionTopic(videoElement, isAiEnabled);
+  const { togglePause, toggleShareHistory, setTopic, ...aiState } = useAiVisionTopic(
+    videoElement,
+    isAiEnabled,
+  );
 
   useEffect(() => {
     if (!aiConfigStore.isConfigured() && !hasShownSetupModal.current) {
@@ -42,6 +45,7 @@ export default function AiView({ videoElement, disabled, onOpenSettings }: AiVie
         onOpenSettings={onOpenSettings}
         onPauseToggle={togglePause}
         onSetTopic={setTopic}
+        onToggleShareHistory={toggleShareHistory}
         className={cssBottom}
       />
       <AiSetupModal

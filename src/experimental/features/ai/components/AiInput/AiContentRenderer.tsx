@@ -1,10 +1,11 @@
 import type { AiVisionState } from '../../hooks/useAiVision';
 import { BottomSheet } from 'pure-web-bottom-sheet/react';
-import { CSSProperties } from 'react';
+import { CSSProperties, useState } from 'react';
 import { css, cx } from '~styled-system/css';
 import AiHeader from './AiContentRenderer/AiHeader';
 import MessageList from './AiContentRenderer/MessageList';
 import StatusContent from './AiContentRenderer/StatusContent';
+import MemoryList from './AiContentRenderer/MemoryList';
 
 interface AiContentRendererProps {
   state: AiVisionState & { topic?: string | null };
@@ -12,6 +13,7 @@ interface AiContentRendererProps {
   onOpenSettings?: () => void;
   onPauseToggle?: () => void;
   onSetTopic?: (topic: string | null) => void;
+  onToggleShareHistory?: () => void;
   className?: string;
 }
 
@@ -44,9 +46,12 @@ export default function AiContentRenderer({
   onOpenSettings,
   onPauseToggle,
   onSetTopic,
+  onToggleShareHistory,
   className,
 }: AiContentRendererProps) {
-  const { status, streamingText, lastError, isPaused, messages, topic } = state;
+  const { status, streamingText, lastError, isPaused, messages, topic, shareHistory } = state;
+
+  const [showMemoryList, setShowMemoryList] = useState(false);
 
   const isProcessing = status === 'capturing' || status === 'streaming';
 
@@ -154,16 +159,29 @@ export default function AiContentRenderer({
             isPaused={isPaused}
             isProcessing={isProcessing}
             topic={topic}
+            shareHistory={shareHistory}
             onPauseToggle={onPauseToggle}
             onSetTopic={onSetTopic}
+            onToggleShareHistory={onToggleShareHistory}
+            onToggleMemoryList={() => setShowMemoryList((prev) => !prev)}
           />
         </div>
 
-        <MessageList
-          messages={messages}
-          streamingText={streamingText}
-          status={status}
-        />
+        {showMemoryList ? (
+          <MemoryList
+            onClose={() => setShowMemoryList(false)}
+            onDisableMemory={() => {
+              onToggleShareHistory?.();
+              setShowMemoryList(false);
+            }}
+          />
+        ) : (
+          <MessageList
+            messages={messages}
+            streamingText={streamingText}
+            status={status}
+          />
+        )}
       </BottomSheet>
     </div>
   );

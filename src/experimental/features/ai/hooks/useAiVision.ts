@@ -1,4 +1,5 @@
 import { aiConfigStore, DEFAULT_SYSTEM_PROMPT } from '../lib/aiConfigStore';
+import { aiMemoryStore } from '../lib/aiMemoryStore';
 import { AppError, ErrorCode } from '@/lib/errors';
 import { captureFrame } from '@/lib/frameCapture';
 import { useIdleContext } from '@/hooks/useIdle';
@@ -30,6 +31,8 @@ export interface AiVisionState {
   lastError: AppError | null;
   isPaused: boolean;
   messages: AiMessage[];
+  shareHistory: boolean;
+  found: boolean;
 }
 
 const PROMPTS_SINGLE = [
@@ -56,40 +59,7 @@ function getNextPrompt(hasPrevious: boolean): string {
 
 const QUESTION_PROMPT = (question: string) => `${question}\n\nAnswer based on the image(s).`;
 const MIN_INTERVAL_MS = 3000;
-
-interface ParsedResponse {
-  description: string;
-}
-
-function parseAiResponse(response: string): ParsedResponse {
-  const trimmed = response.trim();
-
-  try {
-    const parsed = JSON.parse(trimmed);
-    if (typeof parsed.description === 'string') {
-      return { description: parsed.description };
-    }
-  } catch {
-    // Not valid JSON, try to fix truncated JSON
-  }
-
-  // Try to fix truncated JSON by appending closing characters
-  const fixAttempts = [trimmed + '..."}', trimmed + '}'];
-
-  for (const attempt of fixAttempts) {
-    try {
-      const parsed = JSON.parse(attempt);
-      if (typeof parsed.description === 'string') {
-        return { description: parsed.description };
-      }
-    } catch {
-      // Continue to next attempt
-    }
-  }
-
-  // Fallback: use raw response as description
-  return { description: trimmed };
-}
+const FOUND_PATTERN = /\[FOUND\]/i;
 
 function extractDescriptionFromPartialJson(partialJson: string): string | null {
   // Try to extract description from partial JSON
@@ -138,7 +108,11 @@ export function useAiVision(
   videoElement: HTMLVideoElement | null,
   isEnabled: boolean,
   options?: UseAiVisionOptions,
-): AiVisionState & { togglePause: () => void; askQuestion: (question: string) => void } {
+): AiVisionState & {
+  togglePause: () => void;
+  toggleShareHistory: () => void;
+  askQuestion: (question: string) => void;
+} {
   const [state, setState] = useState<AiVisionState>({
     status: 'idle',
     streamingText: '',
@@ -147,6 +121,8 @@ export function useAiVision(
     lastError: null,
     isPaused: false,
     messages: [],
+    shareHistory: true,
+    found: false,
   });
 
   const [configVersion, setConfigVersion] = useState(0);
@@ -192,6 +168,12 @@ export function useAiVision(
     });
   }, [videoElement]);
 
+  const toggleShareHistory = useCallback(() => {
+    setState((prev) => ({ ...prev, shareHistory: !prev.shareHistory }));
+  }, []);
+
+  const foundRef = useRef(false);
+
   const sendMessage = useCallback(
     async (
       currentFrameDataUrl: string,
@@ -199,14 +181,15 @@ export function useAiVision(
       previousDescription: string | null,
       userPrompt: string,
       isQuestion: boolean,
+      shareHistory: boolean,
     ) => {
       if (!aiConfigStore.isConfigured()) {
         return;
       }
 
-      // Generate unique request ID to track this request
       const requestId = ++currentRequestIdRef.current;
       abortControllerRef.current = new AbortController();
+      foundRef.current = false;
 
       setState((prev) => ({
         ...prev,
@@ -214,27 +197,51 @@ export function useAiVision(
         streamingText: '',
         lastCaptureTime: Date.now(),
         lastError: null,
+        found: false,
       }));
 
       try {
         const config = aiConfigStore.config;
         const endpoint = normalizeEndpoint(config.apiEndpoint);
 
-        // Resize images before sending to LLM
         const resizedCurrent = resizeDataUrl(currentFrameDataUrl, 960);
         const resizedPrevious = previousFrameDataUrl
           ? resizeDataUrl(previousFrameDataUrl, 480)
           : null;
 
-        // Build messages array with conversation history
         type MessageContent =
           | { type: 'text'; text: string }
           | { type: 'image_url'; image_url: { url: string } };
 
+        let systemContent = config.systemPrompt || DEFAULT_SYSTEM_PROMPT;
+
+        const memories = shareHistory ? aiMemoryStore.recall() : [];
+        let memoryInstruction = '';
+
+        const userAskedToRemember = isQuestion && /remember|save|memorize/i.test(userPrompt);
+
+        if (shareHistory && userAskedToRemember) {
+          const memoryList =
+            memories.length > 0
+              ? memories.map((m) => `[${m.id}] ${m.content}`).join('\n')
+              : 'No memories saved yet.';
+          memoryInstruction = `\n\nPrevious memories:\n${memoryList}\n\nIMPORTANT: The user explicitly asked you to remember something from this image. Store it using:\n- memory_action: "remember"\n- memory_content: "exactly what the user wants you to remember"\n\nIf the user asked to forget/remove something:\n- memory_action: "remove"\n- memory_id: "the memory ID to remove"\n\nOnly use memory_action if the user explicitly asked.`;
+        } else if (shareHistory && memories.length > 0) {
+          const memoryList = memories.map((m) => `[${m.id}] ${m.content}`).join('\n');
+          memoryInstruction = `\n\nPrevious memories:\n${memoryList}\n\nWhen you notice something worth remembering, include:\n- memory_action: "remember"\n- memory_content: "concise fact to remember"\n\nWhen you want to remove a memory, include:\n- memory_action: "remove"\n- memory_id: "the memory ID to remove"\n\nOtherwise, do not include memory_action in your response.`;
+        } else if (shareHistory) {
+          memoryInstruction = `\n\nWhen you notice something worth remembering, include:\n- memory_action: "remember"\n- memory_content: "concise fact to remember"\n\nWhen you want to remove a memory, include:\n- memory_action: "remove"\n- memory_id: "the memory ID to remove"\n\nOtherwise, do not include memory_action in your response.`;
+        }
+
+        if (memoryInstruction) {
+          systemContent = systemContent + memoryInstruction;
+        }
+
         const messages: Array<{
-          role: 'system' | 'user' | 'assistant';
+          role: 'system' | 'user' | 'assistant' | 'tool';
           content: string | MessageContent[];
-        }> = [{ role: 'system', content: config.systemPrompt || DEFAULT_SYSTEM_PROMPT }];
+          tool_call_id?: string;
+        }> = [{ role: 'system', content: systemContent }];
 
         // Build messages based on context
         if (isQuestion && resizedPrevious && previousDescription) {
@@ -276,42 +283,67 @@ export function useAiVision(
           });
         }
 
+        const requestBody: Record<string, unknown> = {
+          model: config.defaultModel,
+          messages,
+          stream: true,
+          max_tokens: 4096,
+          temperature: config.temperature,
+          top_p: config.topP,
+          top_k: config.topK,
+          min_p: config.minP,
+          presence_penalty: config.presencePenalty,
+          repetition_penalty: config.repetitionPenalty,
+          chat_template_kwargs: { enable_thinking: false },
+        };
+
+        if (shareHistory) {
+          requestBody.response_format = {
+            type: 'json_schema',
+            json_schema: {
+              name: 'vision_response',
+              strict: true,
+              schema: {
+                type: 'object',
+                properties: {
+                  description: { type: 'string' },
+                  memory_action: {
+                    type: 'string',
+                    enum: ['remember', 'remove', 'none'],
+                  },
+                  memory_content: { type: 'string' },
+                  memory_id: { type: 'string' },
+                },
+                required: ['description'],
+                additionalProperties: false,
+              },
+            },
+          };
+        } else {
+          requestBody.response_format = {
+            type: 'json_schema',
+            json_schema: {
+              name: 'vision_response',
+              strict: true,
+              schema: {
+                type: 'object',
+                properties: {
+                  description: { type: 'string' },
+                },
+                required: ['description'],
+                additionalProperties: false,
+              },
+            },
+          };
+        }
+
         const response = await fetch(`${endpoint}/chat/completions`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             ...(config.apiKey ? { Authorization: `Bearer ${config.apiKey}` } : {}),
           },
-          body: JSON.stringify({
-            model: config.defaultModel,
-            messages,
-            stream: true,
-            max_tokens: 4096,
-            temperature: config.temperature,
-            top_p: config.topP,
-            top_k: config.topK,
-            min_p: config.minP,
-            presence_penalty: config.presencePenalty,
-            repetition_penalty: config.repetitionPenalty,
-            chat_template_kwargs: { enable_thinking: false },
-            response_format: {
-              type: 'json_schema',
-              json_schema: {
-                name: 'vision_response',
-                strict: true,
-                schema: {
-                  type: 'object',
-                  properties: {
-                    description: {
-                      type: 'string',
-                    },
-                  },
-                  required: ['description'],
-                  additionalProperties: false,
-                },
-              },
-            },
-          }),
+          body: JSON.stringify(requestBody),
           signal: abortControllerRef.current.signal,
         });
 
@@ -326,7 +358,6 @@ export function useAiVision(
 
         const decoder = new TextDecoder();
         let fullResponse = '';
-
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
@@ -343,7 +374,11 @@ export function useAiVision(
               const content = parsed.choices?.[0]?.delta?.content;
               if (content) {
                 fullResponse += content;
-                // Extract description from partial JSON for streaming display
+                if (!foundRef.current && FOUND_PATTERN.test(fullResponse)) {
+                  foundRef.current = true;
+                  navigator.vibrate([100, 50, 100]);
+                  setState((prev) => ({ ...prev, found: true }));
+                }
                 const partialDescription = extractDescriptionFromPartialJson(fullResponse);
                 if (partialDescription) {
                   setState((prev) => ({
@@ -358,24 +393,52 @@ export function useAiVision(
           }
         }
 
-        const parsed = parseAiResponse(fullResponse);
+        let memoryAction: string | null = null;
+        let memoryContent: string | null = null;
+        let memoryId: string | null = null;
+        let textContent = fullResponse;
 
-        // Store current frame and description for next comparison (only for auto-capture, not questions)
+        try {
+          const parsedResponse = JSON.parse(fullResponse);
+          textContent = parsedResponse.description || '';
+
+          if (shareHistory) {
+            memoryAction = parsedResponse.memory_action || null;
+            memoryContent = parsedResponse.memory_content || null;
+            memoryId = parsedResponse.memory_id || null;
+
+            if (memoryAction === 'remember' && memoryContent) {
+              aiMemoryStore.remember(memoryContent);
+            } else if (memoryAction === 'remove' && memoryId) {
+              aiMemoryStore.forget(memoryId);
+            }
+          }
+        } catch {
+          // If JSON parsing fails, use fullResponse as text
+          textContent = fullResponse;
+        }
+
+        if (!isQuestion && !foundRef.current && FOUND_PATTERN.test(textContent)) {
+          foundRef.current = true;
+          navigator.vibrate([100, 50, 100]);
+          setState((prev) => ({ ...prev, found: true }));
+        }
+
         if (!isQuestion) {
           previousFrameRef.current = currentFrameDataUrl;
-          previousDescriptionRef.current = parsed.description;
+          previousDescriptionRef.current = textContent;
         }
 
         setState((prev) => {
           const newMessages: AiMessage[] = [
             ...prev.messages,
-            { role: 'assistant' as const, content: parsed.description, timestamp: Date.now() },
+            { role: 'assistant' as const, content: textContent, timestamp: Date.now() },
           ].slice(-MAX_MESSAGES);
 
           return {
             ...prev,
             status: 'complete',
-            lastCompleteText: parsed.description,
+            lastCompleteText: textContent,
             streamingText: '',
             isPaused: prev.isPaused,
             messages: newMessages,
@@ -452,8 +515,9 @@ export function useAiVision(
       previousDescriptionRef.current,
       userPrompt,
       false,
+      state.shareHistory,
     );
-  }, [videoElement, isEnabled, sendMessage]);
+  }, [videoElement, isEnabled, sendMessage, state.shareHistory]);
 
   // Ask question - process immediately without requiring pause
   const askQuestion = useCallback(
@@ -498,6 +562,7 @@ export function useAiVision(
           previousDescriptionRef.current,
           QUESTION_PROMPT(question),
           true,
+          state.shareHistory,
         );
       } else {
         // Frame capture failed - reset status and show error
@@ -508,7 +573,7 @@ export function useAiVision(
         }));
       }
     },
-    [videoElement, sendMessage],
+    [videoElement, sendMessage, state.shareHistory],
   );
 
   // Update status based on config/isPaused state
@@ -617,6 +682,7 @@ export function useAiVision(
   return {
     ...state,
     togglePause,
+    toggleShareHistory,
     askQuestion,
   };
 }

@@ -102,6 +102,10 @@ function StreamingMessage({ streamingText }: { streamingText: string }) {
 }
 
 function MessageItem({ msg, time }: { msg: Message; time: string }) {
+  const FOUND_PATTERN = /\[FOUND\]/i;
+  const isFound = msg.role === 'assistant' && FOUND_PATTERN.test(msg.content);
+  const contentWithoutFound = isFound ? msg.content.replace(FOUND_PATTERN, '').trim() : msg.content;
+
   return (
     <div
       className={css({
@@ -118,9 +122,31 @@ function MessageItem({ msg, time }: { msg: Message; time: string }) {
         {msg.role === 'user' ? 'You' : 'AI'} · {time}
       </span>
       <div className={cssMarkdownMessage}>
-        <ReactMarkdown>{msg.content}</ReactMarkdown>
+        <HighlightedMarkdown content={contentWithoutFound} />
       </div>
     </div>
+  );
+}
+
+function HighlightedMarkdown({ content }: { content: string }) {
+  const MARK_PATTERN = /\[mark\]([\s\S]*?)\[\/mark\]/gi;
+
+  if (!MARK_PATTERN.test(content)) {
+    return <ReactMarkdown>{content}</ReactMarkdown>;
+  }
+
+  const processedContent = content.replace(/\[mark\]([\s\S]*?)\[\/mark\]/gi, '`$1`');
+
+  return (
+    <ReactMarkdown
+      components={{
+        code({ children }) {
+          return <span style={{ color: 'rgb(74 222 128)' }}>{children}</span>;
+        },
+      }}
+    >
+      {processedContent}
+    </ReactMarkdown>
   );
 }
 
